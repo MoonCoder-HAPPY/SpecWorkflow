@@ -1,0 +1,4 @@
+interface:
+  display_name: "Spec Do"
+  short_description: "Implement specs, repairs, and amendments"
+  default_prompt: "Use $spec-do to implement the approved spec, repair spec, or amended ticket plan."

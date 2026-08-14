@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fix Review"
+  short_description: "Plan repairs from review findings"
+  default_prompt: "Use $fix-review to turn final review findings into a repair spec."

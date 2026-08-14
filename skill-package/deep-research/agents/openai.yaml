@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deep Research"
+  short_description: "Research from high-trust primary sources"
+  default_prompt: "Use $deep-research to research this from primary sources."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Do Review"
+  short_description: "Review delivery readiness and repairs"
+  default_prompt: "Use $do-review to run final delivery review for the implemented spec or repair pass."

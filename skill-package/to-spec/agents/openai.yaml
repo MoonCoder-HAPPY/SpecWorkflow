@@ -1,0 +1,4 @@
+interface:
+  display_name: "To Spec"
+  short_description: "Create or amend implementation specs"
+  default_prompt: "Use $to-spec to create or amend an implementation-ready spec."

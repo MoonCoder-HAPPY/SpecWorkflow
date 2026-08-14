@@ -1,0 +1,4 @@
+interface:
+  display_name: "To Grill"
+  short_description: "Clarify requirements with focused grilling"
+  default_prompt: "Use $to-grill to clarify this requirement before writing code."
