@@ -60,7 +60,7 @@ Goal Mode is opt-in per spec. When enabled, the agent may continue through imple
 Ask your agent
 
 ```text
-Install this repository's skill-package/* into the project-level skills directory recognized by your current agent tool. Keep the folder names unchanged. After installing, list the installed skills and confirm each one has a SKILL.md.
+Install https://github.com/MoonCoder-HAPPY/SpecWorkflow skill-package/* into the project-level skills directory recognized by your current agent tool. Keep folder names unchanged.
 ```
 
 Use project-level installation when you want SpecWorkflow to apply only to the current repository. Use a global skills directory only if you intentionally want these skills available everywhere.

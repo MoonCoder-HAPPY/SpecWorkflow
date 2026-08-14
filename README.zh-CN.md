@@ -60,7 +60,7 @@ Goal Mode 只对当前 spec 生效，且必须由用户显式选择。启用后�
 把这段交给你的 Agent
 
 ```text
-把本仓库的 skill-package/* 安装到当前 Agent 工具可识别的项目级 skills 目录中。保持目录名不变。安装后列出已安装的 skills，并确认每个目录都有 SKILL.md。
+把 https://github.com/MoonCoder-HAPPY/SpecWorkflow 的 skill-package/* 安装到当前 Agent 工具可识别的项目级 skills 目录中。保持目录名不变。
 ```
 
 如果只想在当前项目使用 SpecWorkflow，就安装到项目级目录。只有明确想让所有项目都能使用时，才安装到全局 skills 目录。
