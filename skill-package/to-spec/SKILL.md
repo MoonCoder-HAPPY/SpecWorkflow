@@ -177,9 +177,9 @@ For each amendment, produce:
 - Migration or rollback impact when relevant.
 - Open decisions, if any.
 
-If the amendment changes behavior, contracts, acceptance criteria, permissions, or testing seams, ask one clarification question when the decision is not already explicit. Do not update canonical artifacts for that branch until the critical decision is closed, deferred, or accepted as risk.
+If the amendment changes behavior, contracts, acceptance criteria, permissions, or testing seams, ask one clarification question using the Decision Question Format when the decision is not already explicit. Do not update canonical artifacts for that branch until the critical decision is closed, deferred, or accepted as risk.
 
-Before writing canonical artifacts for an amendment that changes behavior, contracts, ticket boundaries, dependencies, permissions, acceptance criteria, or testing seams, present the amendment summary and affected canonical paths and wait for explicit user approval. Minor textual clarifications that do not change implementation scope may be recorded without this approval gate.
+Before writing canonical artifacts for an amendment that changes behavior, contracts, ticket boundaries, dependencies, permissions, acceptance criteria, or testing seams, present the amendment summary and affected canonical paths, then ask one approval decision using the Decision Question Format. Include options such as: approve and write canonical artifacts; revise the amendment; record it as deferred/out of scope; pause. Minor textual clarifications that do not change implementation scope may be recorded without this approval gate.
 
 ## Amendment Storage
 

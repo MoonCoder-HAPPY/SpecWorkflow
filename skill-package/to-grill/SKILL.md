@@ -36,7 +36,7 @@ Examples: make a font larger, change a label, adjust spacing, rename visible cop
 
 When the fast path applies, exit this requirement-research workflow: do not create `.spec-workflow/<feature-slug>/requirements.md`, do not produce a full requirement research conclusion, and do not force `to-spec`. State briefly that the request does not need the formal spec-driven delivery workflow and recommend direct implementation.
 
-Do not write code inside `to-grill`. If the user explicitly invoked `/to-grill` or `$to-grill`, or said not to write code yet, wait for the user to confirm direct implementation before editing. If `to-grill` triggered only because the request initially looked ambiguous, the agent may terminate this skill and handle the request through the normal direct-implementation path when no no-code instruction remains.
+Do not write code inside `to-grill`. If the user explicitly invoked `/to-grill` or `$to-grill`, or said not to write code yet, ask one Decision Question before leaving the no-code stage. Present options such as: continue no-code requirement grilling, switch to direct implementation, or move into `to-spec` if the user wants a formal spec. If `to-grill` triggered only because the request initially looked ambiguous, the agent may terminate this skill and handle the request through the normal direct-implementation path when no no-code instruction remains.
 
 Use the full `to-grill` workflow when the request is ambiguous, product-facing, risky, cross-module, data/security-sensitive, or when the user explicitly asks for the full workflow despite the fast-path recommendation.
 
@@ -80,6 +80,17 @@ Record the gate result in `.spec-workflow/<feature-slug>/requirements.md`:
 - If you recommend one option, mark it as recommended, but still show the alternatives. The user must be able to answer by selecting an option label or by writing a custom answer.
 - Continue until each key question is closed, or explicitly marked as "not solved this round", "deferred", or "user accepts risk".
 - Record every unconfirmed critical item as a pending alignment issue until it is closed, deferred, out of scope, or accepted as risk.
+
+## Decision Question Format
+
+Use this format for every user-owned decision in this skill, including direct-implementation fast-path exits, branch choice, dirty-worktree handling, product/business clarification, scope tradeoffs, risk acceptance, and whether to move into `to-spec`:
+
+- Ask exactly one decision question at a time.
+- Present 2-4 explicit options. Each option must have a short label and a one-line consequence or tradeoff.
+- Mark one option as recommended when context supports a recommendation.
+- Let the user answer by option label, short free text, or a custom alternative.
+- Do not ask open-ended confirmation questions such as "Do you confirm?", "Is this OK?", or "Yes/no?" when more than one reasonable path exists.
+- For dangerous or irreversible operations such as branch switching or committing, first present the options, then require exact confirmation of the chosen operation and file/scope list before executing it.
 
 ## Initial Pass
 
