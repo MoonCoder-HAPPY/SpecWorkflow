@@ -76,6 +76,8 @@ Record the gate result in `.spec-workflow/<feature-slug>/requirements.md`:
 - If a decision belongs to the user or product owner, ask the user and wait for the answer.
 - Ask one question at a time. Do not batch multiple questions into one large questionnaire.
 - For every decision question, include your recommended answer and the reason.
+- For every user-owned decision, provide 2-4 explicit options. Each option must have a short label and one-line consequence/tradeoff. Do not ask open-ended confirmation questions such as "Do you confirm?", "Is this OK?", or "Yes/no?" when more than one reasonable path exists.
+- If you recommend one option, mark it as recommended, but still show the alternatives. The user must be able to answer by selecting an option label or by writing a custom answer.
 - Continue until each key question is closed, or explicitly marked as "not solved this round", "deferred", or "user accepts risk".
 - Record every unconfirmed critical item as a pending alignment issue until it is closed, deferred, out of scope, or accepted as risk.
 
@@ -121,8 +123,8 @@ When grilling:
 
 1. Choose the highest-leverage unresolved decision.
 2. Ask exactly one question.
-3. Include your recommended answer.
-4. Explain the impact of choosing that answer.
+3. Present 2-4 concrete options, with one marked as recommended when you have enough context.
+4. Explain the impact of the recommended answer and any important tradeoff in the alternatives.
 5. Wait for the user before asking the next question or moving on.
 
 Walk the decision tree one branch at a time. Resolve prerequisite decisions before dependent decisions, and do not act as though a branch is settled until the user, repo, or authoritative documentation has closed it.
@@ -131,13 +133,25 @@ After the user answers, re-check the requirement. If anything remains unclear, i
 
 ## Question Style
 
-Make questions concrete and decision-oriented. Prefer:
+Make questions concrete and decision-oriented. A good question is a small decision menu, not a bare confirmation prompt.
+
+Prefer:
 
 ```text
-I recommend supporting only admin-triggered manual retry in this round, not automatic retry, because automatic retry requires additional idempotency and backoff decisions. Do you confirm this scope?
+Which retry scope should this round use?
+
+A. Admin-triggered manual retry (Recommended) - keeps the scope small and avoids idempotency/backoff design in this round.
+B. Automatic retry - better recovery, but requires idempotency, retry limits, backoff, and observability decisions.
+C. No retry in this round - fastest delivery, but failed jobs need external/manual handling.
 ```
 
-Avoid broad questionnaires like:
+Avoid yes/no confirmations that hide the alternatives:
+
+```text
+I recommend supporting only admin-triggered manual retry in this round. Do you confirm this scope?
+```
+
+Also avoid broad questionnaires like:
 
 ```text
 Please describe the user, scenario, permissions, data, acceptance criteria, and exception cases.
