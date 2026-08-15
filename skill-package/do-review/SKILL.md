@@ -43,6 +43,8 @@ Use this format for every user-owned decision in this skill, including ambiguous
 - Present 2-4 explicit options. Each option must have a short label and a one-line consequence or tradeoff.
 - Mark one option as recommended when context supports a recommendation.
 - Let the user answer by option label, short free text, or a custom alternative.
+- After the user chooses, review the chosen option before treating it as settled. Evaluate reasonableness, efficiency, safety, security, performance, maintainability, scope fit, data/permission impact, verification cost, and reversibility. Do not blindly accept or flatter the user's choice.
+- If the chosen option is unsafe, inefficient, inconsistent with repo facts, likely to cause scope creep, or weaker than an available alternative, say so plainly, explain the risk, recommend a better option, and ask one follow-up Decision Question. Only proceed after the risk is resolved, explicitly accepted, or deferred.
 - Do not ask open-ended confirmation questions such as "Do you confirm?", "Is this OK?", or "Yes/no?" when more than one reasonable path exists.
 - For dangerous or irreversible verification, first present the options, then require exact confirmation of the chosen action, environment, data scope, and rollback/safety assumptions before executing it.
 
