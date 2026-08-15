@@ -48,9 +48,9 @@ Before writing the requirement artifact:
 
 - If the project is not a git repo, state that no git baseline is available and continue. Record `Git entry: not a git repo` in `requirements.md`.
 - If the project is a git repo, record the current branch, `HEAD`, and `git status --porcelain=v1 -uall`.
-- Ask the user whether this workflow should continue on the current branch or on a new branch. Include your recommendation and wait for the user's explicit choice.
+- Ask the user whether this workflow should continue on the current branch, continue on a new branch, or pause for manual branch handling. Provide explicit options, include your recommendation, and wait for the user's explicit choice.
 - Do not create, switch, checkout, stash, reset, or commit until the user explicitly confirms that operation.
-- If the worktree is dirty before the branch decision, list the dirty files and explain that switching branches may carry or block those changes. Ask whether to commit first, continue while recording the dirty baseline, or pause for manual cleanup.
+- If the worktree is dirty before the branch decision, list the dirty files and explain that switching branches may carry or block those changes. Ask whether to commit an exact reviewed scope first, continue while recording the dirty baseline, or pause for manual cleanup using explicit options.
 - If the user chooses to commit first, ask for confirmation of the exact files or scope before committing. Never include unrelated dirty files by default.
 - For any pre-workflow commit, show the exact proposed file list first. Exclude unresolved conflicts, unrelated files, local secrets, generated build output, dependency cache files, temporary/debug artifacts, and files with unknown purpose. Run only the validation that is appropriate and available for those pre-existing changes; if validation is unavailable, unknown, or failing, report that status and commit only after the user explicitly accepts it.
 - If the user chooses to continue with dirty files, preserve the dirty baseline exactly as the pre-workflow baseline and label it as pre-existing user work.

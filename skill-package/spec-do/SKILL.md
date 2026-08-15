@@ -24,7 +24,7 @@ This skill uses built-in implementation behavior plus internal subagent coordina
 - Read the current spec's Goal Mode metadata before deciding whether to auto-continue after implementation. Goal Mode applies only to the current spec or current amendment that explicitly enabled it.
 - Do not expand scope beyond the approved spec or ticket. Record out-of-scope discoveries as follow-up work.
 - Do not invent missing business rules, data semantics, permission behavior, acceptance criteria, migration strategy, rollback behavior, or external service contracts.
-- If a required product or business decision is missing, use the built-in grilling gate: ask exactly one focused question with a recommended answer, explain the impact, and wait for the user before implementing that branch.
+- If a required product or business decision is missing, use the built-in grilling gate: ask exactly one focused question using the Decision Question Format below, explain the impact, and wait for the user before implementing that branch.
 - If the spec conflicts with current code, pause the affected branch, name the conflict, and decide whether the spec needs adjustment or the code needs repair. Ask the user only when the decision is product/business-facing.
 - Do not fake implementation, mock a success path as the real path, hard-code business results, create UI-only closure for backend behavior, leave TODO pseudo-completion, silently swallow errors, or bypass real logic only to satisfy tests.
 - Before implementation, decide whether the approved work should run as local serial implementation or use internal subagents. Do not ask the user to choose an execution mode merely for process.
@@ -34,6 +34,17 @@ This skill uses built-in implementation behavior plus internal subagent coordina
 - Do not invoke external orchestration skills, external coordination runtimes, or external orchestration commands for implementation coordination.
 - You may update non-production workflow artifacts under `.spec-workflow/<feature-slug>/`, such as ticket statuses and `implementation-report.md`, as part of durable handoff.
 - Before ending, wait for every child agent started by this skill. If a child agent is stuck or silent for a long time, use the built-in stalled-child policy below before exiting.
+
+## Decision Question Format
+
+Use this format for every user-owned decision in this skill, including product/business clarification, branch mismatch handling, new dirty files, auto-commit, testing seams, risk acceptance, and scope expansion:
+
+- Ask exactly one decision question at a time.
+- Present 2-4 explicit options. Each option must have a short label and a one-line consequence or tradeoff.
+- Mark one option as recommended when context supports a recommendation.
+- Let the user answer by option label, short free text, or a custom alternative.
+- Do not ask open-ended confirmation questions such as "Do you confirm?", "Is this OK?", or "Yes/no?" when more than one reasonable path exists.
+- For dangerous or irreversible operations such as branch switching, stashing, committing, destructive verification, or external side effects, first present the options, then require exact confirmation of the chosen operation and file/scope list before executing it.
 
 ## Inputs
 
@@ -107,15 +118,15 @@ Before changing files, consume the git entry metadata from the authoritative `re
 - If the project is not a git repo, state that no git baseline can be checked and continue.
 - If no prior git entry metadata exists, create a local implementation baseline by recording the current branch, `HEAD`, and `git status --porcelain=v1 -uall`; then continue with the Implementation Commit Gate.
 - If prior git entry metadata exists, compare the current repo path, branch, `HEAD`, and dirty-worktree state against the recorded workflow entry decision.
-- If the user chose a specific current branch or new branch in `to-grill` or `to-spec`, stop before implementation when the current branch differs. Ask whether to switch to the recorded branch, continue on the current branch, or pause.
+- If the user chose a specific current branch or new branch in `to-grill` or `to-spec`, stop before implementation when the current branch differs. Ask whether to switch to the recorded branch, continue on the current branch, or pause using the Decision Question Format.
 - If the recorded starting `HEAD` differs from the current `HEAD`, classify the difference as expected prior implementation work, user-approved branch movement, or unknown drift. Continue only when the current request or artifacts make the movement safe; otherwise ask one focused question.
-- If new dirty files appeared after the recorded dirty baseline, list them separately from pre-existing dirty files and ask whether to include them as intentional context, leave them unrelated and excluded, commit/stash/clean manually, or pause.
+- If new dirty files appeared after the recorded dirty baseline, list them separately from pre-existing dirty files and ask whether to include them as intentional context, leave them unrelated and excluded, commit/stash/clean manually, or pause using the Decision Question Format.
 - Do not switch branches, stash, reset, clean, or commit during this baseline check unless the user explicitly confirms that exact operation.
 - Record the baseline check result in `implementation-report.md`, including prior metadata source, current branch and `HEAD`, mismatch decisions, new dirty files, and whether implementation proceeded.
 
 ## Implementation Commit Gate
 
-After the coordination structure is chosen and before changing production, test, migration, config, generated, dependency, or committed workflow artifact files beyond the baseline/commit-gate records, ask whether this implementation pass may automatically create a git commit after successful completion.
+After the coordination structure is chosen and before changing production, test, migration, config, generated, dependency, or committed workflow artifact files beyond the baseline/commit-gate records, ask whether this implementation pass may automatically create a git commit after successful completion. Use the Decision Question Format with options such as: no auto-commit; auto-commit after successful validation; pause and decide after implementation.
 
 This is separate from the workflow git entry gate in `to-grill` or `to-spec`:
 
@@ -252,7 +263,7 @@ Prefer test-driven development at the seams agreed in `to-spec` or in the `fix-r
 Before writing any test:
 
 - Write down the public seams under test.
-- Confirm the seams with the user when the spec does not already contain an explicit testing-seam decision.
+- Confirm the seams with the user using the Decision Question Format when the spec does not already contain an explicit testing-seam decision.
 - Do not write tests at an unconfirmed seam.
 - Use `CONTEXT.md`, ADRs, and project vocabulary so test names and interfaces match the domain.
 
@@ -358,7 +369,7 @@ If code and spec conflict:
 - Cite the spec requirement and the observed code reality.
 - Check whether an amendment record already resolves the conflict or changes the canonical requirement.
 - Decide whether the implementation can adapt without changing product semantics.
-- Use the built-in grilling gate when the choice changes product behavior, data semantics, permissions, rollout, or acceptance criteria. Ask one decision question with a recommendation and wait before expanding implementation.
+- Use the built-in grilling gate when the choice changes product behavior, data semantics, permissions, rollout, or acceptance criteria. Ask one decision question using the Decision Question Format and wait before expanding implementation.
 
 If child agents conflict:
 

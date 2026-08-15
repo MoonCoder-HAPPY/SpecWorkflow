@@ -26,9 +26,20 @@ This skill internalizes the behavior needed for review repair planning, clarific
 - Do not create commits, amend commits, create branches, switch branches, stash, reset, or clean the worktree during this planning stage. Report any needed git operation as a recommendation for the user or the next `spec-do` implementation stage.
 - Do not expand scope beyond fixing review findings and required regressions. Record unrelated discoveries as follow-up work.
 - Do not invent business expectations, interaction rules, data definitions, calculation/reporting rules, data semantics, permission boundaries, compatibility strategy, acceptance criteria, or ship decisions.
-- If a required decision is unclear, use the built-in grilling loop: ask exactly one decision question, include your recommended answer, explain the impact, and wait before planning that branch.
+- If a required decision is unclear, use the built-in grilling loop: ask exactly one decision question using the Decision Question Format below, include your recommended option, explain the impact, and wait before planning that branch.
 - Continue grilling until each repair-critical ambiguity is closed, deferred, out of scope, or explicitly accepted as risk.
 - If a finding lacks evidence, mark it as insufficiently evidenced and either investigate context or classify it as residual risk; do not plan speculative repairs as must-fix work.
+
+## Decision Question Format
+
+Use this format for every user-owned decision in this skill, including repair scope, evidence sufficiency, accepted risk, Goal Mode repair handoff, repair ticket granularity, blocking edges, and merge/split choices:
+
+- Ask exactly one decision question at a time.
+- Present 2-4 explicit options. Each option must have a short label and a one-line consequence or tradeoff.
+- Mark one option as recommended when context supports a recommendation.
+- Let the user answer by option label, short free text, or a custom alternative.
+- Do not ask open-ended confirmation questions such as "Do you confirm?", "Is this OK?", or "Yes/no?" when more than one reasonable path exists.
+- For tracker writes or other externally visible changes, first present the options, then require exact confirmation of the chosen target and scope before executing it.
 
 ## Fast-Path Guard
 
@@ -132,8 +143,8 @@ When grilling:
 
 1. Choose the highest-leverage unresolved decision.
 2. Ask exactly one question.
-3. Include your recommended answer.
-4. Explain the impact of choosing that answer.
+3. Present 2-4 concrete options, with one marked as recommended when you have enough context.
+4. Explain the impact of the recommended option and important tradeoffs in the alternatives.
 5. Wait for the user's answer.
 6. Re-check for new ambiguity, inconsistency, or dependency.
 
@@ -234,7 +245,7 @@ Store repair-planning evidence, root-cause notes, reproduced command output, scr
 
 Use this repair spec and optional repair tickets as the authoritative input for the next repair implementation pass. If the user explicitly provides an issue tracker target, or the project has a documented issue tracker workflow in existing repo guidance, publish repair specs and repair tickets there as well and apply the local equivalent of `ready-for-agent` status when available. Do not depend on any external setup skill to discover or configure this; use only explicit user instructions or existing project documentation. Keep the local `.spec-workflow` repair artifact as the durable handoff unless the user explicitly says the external tracker is the only source of truth.
 
-If the user designates an external tracker as the only source of truth for the repair pass, write `Authority: external-tracker-only`, the tracker reference, and `Local Goal Mode cache: non-authoritative` into `repair-spec.md`, the append-only `repair-specs/<NN>-<pass-slug>.md`, and every affected `repair-issues/` ticket. Otherwise write `Authority: local-scratch` or `Authority: local-scratch-plus-tracker` as appropriate. Later `spec-do` must respect this marker and verify Goal Mode authorization from the tracker before relying on local cached repair artifacts.
+If the user designates an external tracker as the only source of truth for the repair pass, write `Authority: external-tracker-only`, the tracker reference, and `Local Goal Mode cache: non-authoritative` into `repair-spec.md`, the append-only `repair-specs/<NN>-<pass-slug>.md`, and every affected `repair-issues/` ticket. Otherwise write `Authority: local-spec-workflow` or `Authority: local-spec-workflow-plus-tracker` as appropriate. Later `spec-do` must respect this marker and verify Goal Mode authorization from the tracker before relying on local cached repair artifacts.
 
 When publishing to a real issue tracker, create one issue per repair ticket in dependency order, blockers first. Use the tracker native blocking, sub-issue, or dependency relationship where available; otherwise include a `Blocked by` section that references the blocking issue identifiers. If the source was an existing parent issue, review report, or tracker item, reference it from the generated repair spec or ticket, but do not close, retitle, relabel, or otherwise modify the parent item unless the user explicitly asks.
 
@@ -269,7 +280,7 @@ For each repair ticket, include:
 - Input context for `spec-do`: repair spec path, ticket path, blockers, relevant modules/docs, and verification seams or commands.
 - Status: `ready-for-agent`.
 
-Before persisting repair tickets, present the proposed ticket breakdown with `Title`, `Blocked by`, and `What it repairs`. Ask whether the granularity, blocking edges, parallel boundaries, and merge/split choices are correct. Iterate until approved unless the user explicitly says to skip approval.
+Before persisting repair tickets, present the proposed ticket breakdown with `Title`, `Blocked by`, and `What it repairs`. Ask one decision question using the Decision Question Format with options such as: accept as proposed; adjust blocking edges; merge or split specific tickets; pause for manual rewrite. Iterate until approved unless the user explicitly says to skip approval.
 
 ## Final Output
 

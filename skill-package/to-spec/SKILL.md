@@ -31,12 +31,23 @@ This skill internalizes the behavior that would otherwise be provided by separat
 - Base the spec on the prior `to-grill` requirement research conclusion when it exists, preferably from `.spec-workflow/<feature-slug>/requirements.md`.
 - If no prior research conclusion exists, synthesize from the current conversation and available repo context, then check for unresolved blocking ambiguity.
 - Do not invent business rules, data semantics, permission boundaries, interaction details, acceptance criteria, migration strategy, or rollback behavior.
-- If an essential decision is missing, ask exactly one focused question with a recommended answer and wait for the user.
+- If an essential decision is missing, ask exactly one focused question using the Decision Question Format below and wait for the user.
 - Do not proceed to implementation while essential spec decisions remain open.
 - If the task is small, do not create ticket guidance just to satisfy process.
 - Persist the completed spec, and any generated tickets, using the storage rules below unless the user explicitly provides another path.
 - When amending an existing spec, do not silently expand implementation scope that is already in progress. Mark the change as a spec amendment and update the handoff artifacts before `spec-do` continues.
-- For every new spec and every recorded amendment, ask the user whether to enable Goal Mode for this current spec version only. Never infer Goal Mode from prior specs, prior amendments, prior conversations, project defaults, or user preference history.
+- For every new spec and every recorded amendment, ask the user to choose the Goal Mode setting for this current spec version only using the Decision Question Format below. Never infer Goal Mode from prior specs, prior amendments, prior conversations, project defaults, or user preference history.
+
+## Decision Question Format
+
+Use this format for every user-owned decision in this skill, including requirement clarification, git branch or dirty-worktree handling, Goal Mode, testing seams, ticket breakdown, tracker authority, and risk acceptance:
+
+- Ask exactly one decision question at a time.
+- Present 2-4 explicit options. Each option must have a short label and a one-line consequence or tradeoff.
+- Mark one option as recommended when context supports a recommendation.
+- Let the user answer by option label, short free text, or a custom alternative.
+- Do not ask open-ended confirmation questions such as "Do you confirm?", "Is this OK?", or "Yes/no?" when more than one reasonable path exists.
+- For dangerous or irreversible operations such as branch switching, committing, tracker writes, or external side effects, first present the options, then require exact confirmation of the chosen operation and file/scope list before executing it.
 
 ## Fast-Path Guard
 
@@ -70,9 +81,9 @@ When no usable prior gate exists:
 
 - If the project is not a git repo, state that no git baseline is available and continue. Record `Git entry: not a git repo` in `spec.md` or the amendment record.
 - If the project is a git repo, record the current branch, `HEAD`, and `git status --porcelain=v1 -uall`.
-- Ask the user whether this workflow should continue on the current branch or on a new branch. Include your recommendation and wait for the user's explicit choice.
+- Ask the user whether this workflow should continue on the current branch, continue on a new branch, or pause for manual branch handling. Use the Decision Question Format and include your recommendation.
 - Do not create, switch, checkout, stash, reset, or commit until the user explicitly confirms that operation.
-- If the worktree is dirty before the branch decision, list the dirty files and explain that switching branches may carry or block those changes. Ask whether to commit first, continue while recording the dirty baseline, or pause for manual cleanup.
+- If the worktree is dirty before the branch decision, list the dirty files and explain that switching branches may carry or block those changes. Ask whether to commit an exact reviewed scope first, continue while recording the dirty baseline, or pause for manual cleanup using the Decision Question Format.
 - If the user chooses to commit first, ask for confirmation of the exact files or scope before committing. Never include unrelated dirty files by default.
 - For any pre-workflow commit, show the exact proposed file list first. Exclude unresolved conflicts, unrelated files, local secrets, generated build output, dependency cache files, temporary/debug artifacts, and files with unknown purpose. Run only the validation that is appropriate and available for those pre-existing changes; if validation is unavailable, unknown, or failing, report that status and commit only after the user explicitly accepts it.
 - If the user chooses to continue with dirty files, preserve the dirty baseline exactly as pre-existing user work.
@@ -93,13 +104,12 @@ Run this gate once for each new spec and once for every recorded amendment befor
 
 Goal Mode is a per-spec autopilot authorization. It allows later stages to continue from this specific spec into implementation, final review, repair planning, repair implementation, and repeated final review without asking for low-value step-by-step confirmation. It never applies to another spec, another feature directory, another issue, or a future amendment unless the user explicitly chooses it again for that current spec.
 
-Ask the user whether to enable Goal Mode before writing the final canonical `spec.md`:
+Ask the user to choose Goal Mode before writing the final canonical `spec.md`:
 
-- If the user says no, record `Goal mode: disabled` in `spec.md` and proceed with the normal staged workflow.
-- If the user says yes, record `Goal mode: enabled for this spec only` in `spec.md`.
-- Ask for the goal target. Default recommendation: `Implement the current spec, pass agreed validation, complete final review with no must-fix findings, and reach Ship Decision: can ship`.
-- Ask for the maximum automatic repair cycles. Default recommendation: `2`.
-- Ask whether implementation passes under this spec may auto-commit after successful validation. This is still scoped to the current spec only and does not allow auto-push.
+- Present at least these options: Goal Mode disabled; Goal Mode enabled for this spec only with no auto-commit; Goal Mode enabled for this spec only with auto-commit after successful validation; pause and decide later.
+- If the user enables Goal Mode, ask follow-up decision questions one at a time using the Decision Question Format for the goal target, maximum automatic repair cycles, and auto-commit authorization. Default recommendation for the target: `Implement the current spec, pass agreed validation, complete final review with no must-fix findings, and reach Ship Decision: can ship`. Default recommendation for maximum automatic repair cycles: `2`.
+- If the user disables Goal Mode, record `Goal mode: disabled` in `spec.md` and proceed with the normal staged workflow.
+- If the user enables Goal Mode, record `Goal mode: enabled for this spec only` in `spec.md`.
 - Record every answer in `spec.md`; in amendment mode, also record the refreshed Goal Mode decision in the amendment record.
 - Record a stable authorization anchor: spec ID, amendment ID when applicable, artifact root, authority marker, decision source (`user-confirmed-in-current-conversation`), decision timestamp or current date, supersedes prior Goal Mode authorization, and superseded-by marker when a later amendment exists.
 - Treat the Goal Mode section in the current canonical `spec.md` plus the latest applicable amendment record as the only authorization source. Later implementation, review, and repair reports may record runtime state, but they must not enable, re-enable, broaden, or extend Goal Mode.
@@ -196,7 +206,7 @@ Use these rules:
 - When ticket order changes, preserve existing ticket file names when possible and update `Dependencies`, `Blocked by`, `Status`, and `Input context for spec-do` sections instead of renumbering every file.
 - If renumbering is unavoidable, explain why in the amendment record and final response.
 - If an external issue tracker is authoritative, mirror the same amendment summary, ticket status changes, and dependency changes there using explicit user instructions or documented project workflow.
-- If the user designates an external tracker as the only source of truth, write `Authority: external-tracker-only` and the tracker reference into `spec.md`, affected tickets, and amendment records. Otherwise write `Authority: local-scratch` or `Authority: local-scratch-plus-tracker` as appropriate.
+- If the user designates an external tracker as the only source of truth, write `Authority: external-tracker-only` and the tracker reference into `spec.md`, affected tickets, and amendment records. Otherwise write `Authority: local-spec-workflow` or `Authority: local-spec-workflow-plus-tracker` as appropriate.
 
 Each amendment record must include:
 
@@ -217,7 +227,7 @@ After amendment storage completes, the canonical `spec.md` and `issues/` are the
 
 ## Built-In Clarification Loop
 
-Ask one decision question at a time when any of these are unclear:
+Ask one decision question at a time using the Decision Question Format when any of these are unclear:
 
 - Business rules.
 - Data source, data path, or data semantics.
@@ -286,7 +296,7 @@ Define testing at public seams:
 - Include frontend real-interaction verification when the feature has UI behavior.
 - Include backend API/service/repository/migration verification when backend behavior changes.
 
-Before finalizing, present the proposed testing seams and ask the user to confirm they match expectations. If the testing seam itself is a product or architecture decision and is not obvious from repo patterns, ask one clarification question before finalizing the spec.
+Before finalizing, present the proposed testing seams and ask the user to choose: accept the proposed seams, adjust one or more seams, defer the seam decision as accepted risk, or pause. If the testing seam itself is a product or architecture decision and is not obvious from repo patterns, ask one clarification question using the Decision Question Format before finalizing the spec.
 
 ## Artifact Storage
 
@@ -364,7 +374,7 @@ For each ticket, include:
 - Parallel execution boundary.
 - Input context for `spec-do`: spec path, this ticket path, blockers, relevant modules or docs, and verification seams or commands.
 
-Before persisting tickets, present a numbered ticket breakdown with `Title`, `Blocked by`, and `What it delivers`. Ask the user whether the granularity feels right, whether the blocking edges are correct, and whether any tickets should be merged or split. Iterate until the user approves the breakdown, unless the user explicitly instructs you to skip approval. Then persist each ticket using the artifact storage rules above. The goal is to produce executable, durable guidance for the next stage.
+Before persisting tickets, present a numbered ticket breakdown with `Title`, `Blocked by`, and `What it delivers`. Ask one decision question using the Decision Question Format with options such as: accept as proposed; adjust blocking edges; merge or split specific tickets; pause for manual rewrite. Iterate until the user approves the breakdown, unless the user explicitly instructs you to skip approval. Then persist each ticket using the artifact storage rules above. The goal is to produce executable, durable guidance for the next stage.
 
 ## Final Output
 

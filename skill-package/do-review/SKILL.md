@@ -27,13 +27,24 @@ This skill uses built-in review behavior plus internal subagent coordination whe
 - Read Goal Mode authorization from the current spec and latest applicable amendment when present. Read `implementation-report.md` only for runtime ledger state such as cycle counts, validation status, child-agent state, and next automatic stage. Goal Mode applies only to the current spec version that explicitly enabled it.
 - Consume git entry decisions, dirty-worktree baselines, implementation fixed points, commit hashes, and auto-commit decisions from workflow artifacts when present. Use them to define the review diff and to separate implementation changes from pre-existing user work.
 - Respect `Authority: external-tracker-only` markers in local artifacts. When present, read the named tracker item as the authoritative spec/review source and Goal Mode authorization source before relying on local `.spec-workflow` files.
-- If a business expectation, interaction rule, or acceptance criterion is unclear, use the built-in grilling gate: ask exactly one focused decision question with a recommended answer and wait. Do not reinterpret the requirement silently.
+- If a business expectation, interaction rule, or acceptance criterion is unclear, use the built-in grilling gate: ask exactly one focused decision question using the Decision Question Format below and wait. Do not reinterpret the requirement silently.
 - If a fix is needed, record the finding and recommend the next stage, `fix-review`, to produce a repair spec. Outside Goal Mode, concrete low-risk evidence-backed findings that need only an obvious direct edit and do not change product behavior, API/data contracts, permissions, acceptance criteria, testing seams, or cross-module design may be routed to direct implementation instead of forcing `fix-review`. In Goal Mode, must-fix findings must not bypass `fix-review` unless the user explicitly interrupts the automatic loop and authorizes direct repair. Do not call another spec-planning skill from here.
 - Do not accept fake responses, mocked success flows, hard-coded business results, UI-only closure for backend behavior, TODO pseudo-completion, silent errors, or tests that bypass real business logic.
 - Do not create commits, amend commits, create branches, switch branches, stash, reset, or clean the worktree during this review stage. Report any needed git operation as a recommendation for the user or the next implementation stage.
 - Run side-effectful verification only in local, test, staging, or otherwise isolated environments with test accounts and disposable or rollback-safe data. In production or unknown environments, perform only read-only checks and report blocked verification or residual risk.
 - Do not click or call destructive/high-risk actions such as delete, payment, publish, irreversible migration, user notification, permission escalation, or external write unless the environment is isolated and the action is explicitly safe or reversible.
 - Before ending, wait for every review child agent started by this skill. If a child agent is stuck or silent for a long time, use the built-in stalled-child policy below before exiting.
+
+## Decision Question Format
+
+Use this format for every user-owned decision in this skill, including ambiguous acceptance criteria, unstable implementation state, exhausted Goal Mode repair budget, risk acceptance, partial review, and destructive verification:
+
+- Ask exactly one decision question at a time.
+- Present 2-4 explicit options. Each option must have a short label and a one-line consequence or tradeoff.
+- Mark one option as recommended when context supports a recommendation.
+- Let the user answer by option label, short free text, or a custom alternative.
+- Do not ask open-ended confirmation questions such as "Do you confirm?", "Is this OK?", or "Yes/no?" when more than one reasonable path exists.
+- For dangerous or irreversible verification, first present the options, then require exact confirmation of the chosen action, environment, data scope, and rollback/safety assumptions before executing it.
 
 ## Inputs
 
@@ -70,7 +81,7 @@ When Goal Mode is enabled for the current spec only:
   3. After any required completion/decrement step, evaluate the review outcome using the updated remaining budget.
   4. If review classification is `complete` and Ship Decision is `can ship`, stop the automatic loop and report that the current spec goal is satisfied.
   5. If must-fix issues remain and the updated ledger shows remaining repair cycle budget for the current authorization anchor, reserve the next repair cycle in `implementation-report.md`, write or update the review report with that reservation, then continue to `fix-review` automatically.
-  6. If must-fix issues remain but the updated repair cycle budget is exhausted, pause and ask the user whether to extend Goal Mode for this same spec, accept the remaining risk, or stop.
+  6. If must-fix issues remain but the updated repair cycle budget is exhausted, pause and ask the user using the Decision Question Format whether to extend Goal Mode for this same spec, accept the remaining risk, or stop.
 
 When Goal Mode is disabled or absent, recommend `fix-review` or direct implementation as appropriate, but do not enter the next stage automatically.
 
@@ -79,7 +90,7 @@ When Goal Mode is disabled or absent, recommend `fix-review` or direct implement
 Before starting final review tasks, confirm the implementation state is stable enough to review:
 
 - If `implementation-report.md` or ticket files show live child-agent ownership, in-progress implementation tasks, unresolved merge/integration work, unrecovered partial child output, missing final aggregation, or blocked validation required by the spec, do not perform a normal final review.
-- Ask the user whether to pause for `spec-do` to finish, run a clearly labeled partial review, or classify the delivery as `incomplete` based on the unfinished implementation state.
+- Ask the user using the Decision Question Format whether to pause for `spec-do` to finish, run a clearly labeled partial review, or classify the delivery as `incomplete` based on the unfinished implementation state.
 - A partial review must label its scope, exclude unmerged child work unless explicitly included as evidence, and must not produce `can ship`.
 - If reviewing a committed implementation, resolve the fixed point and review target commit before starting review. If reviewing uncommitted implementation, compare against the recorded dirty-worktree baseline and identify which dirty files belong to the implementation pass.
 - If the fixed point, target diff, or ownership state cannot be established, ask one focused clarification question before dispatching review child agents or writing review artifacts.
@@ -279,7 +290,7 @@ Use these rules:
 - Number review pass reports from `01` in chronological order within `review-reports/`.
 - Generate `<pass-slug>` from the reviewed spec, ticket, repair ticket, or review target using lowercase kebab-case.
 - Write both reports with the final aggregated report, not only raw child-agent findings.
-- Include artifact authority metadata in both reports: `Authority: external-tracker-only`, `Authority: local-scratch`, or `Authority: local-scratch-plus-tracker`; the source-of-truth tracker or artifact reference; local cache status; and the exact requirement, spec, amendment, repair, implementation, diff, and review sources read.
+- Include artifact authority metadata in both reports: `Authority: external-tracker-only`, `Authority: local-spec-workflow`, or `Authority: local-spec-workflow-plus-tracker`; the source-of-truth tracker or artifact reference; local cache status; and the exact requirement, spec, amendment, repair, implementation, diff, and review sources read.
 - If `review-report.md` already exists, read it first and update intentionally instead of blindly overwriting.
 - The final response must list the latest review report path and append-only review pass report path written. If no files were written, state that the review was provided only in the response.
 

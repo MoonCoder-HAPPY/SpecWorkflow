@@ -9,6 +9,17 @@ A discipline for hard bugs. Skip phases only when explicitly justified.
 
 When exploring the codebase, read `CONTEXT.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
+## Decision Question Format
+
+Use this format for every user-owned decision in this skill, including branch choice, dirty-worktree handling, pre-fix commit, auto-commit, bisection risk, production or unknown-environment actions, temporary instrumentation, and residual risk acceptance:
+
+- Ask exactly one decision question at a time.
+- Present 2-4 explicit options. Each option must have a short label and a one-line consequence or tradeoff.
+- Mark one option as recommended when context supports a recommendation.
+- Let the user answer by option label, short free text, or a custom alternative.
+- Do not ask open-ended confirmation questions such as "Do you confirm?", "Is this OK?", or "Yes/no?" when more than one reasonable path exists.
+- For dangerous or irreversible operations such as branch switching, committing, bisection in the active worktree, production instrumentation, data mutation, or external side effects, first present the options, then require exact confirmation of the chosen operation, environment, files/scope, rollback path, and cleanup plan before executing it.
+
 ## Git And Commit Gates
 
 Run these gates before fixing code. Diagnosis may read files, run existing tests, inspect logs, and build disposable repro harnesses outside the repo or in the system temp directory before the entry gate is closed. Do not write any repo file, including `.spec-workflow` workflow artifacts, production code, committed test directories, migration directories, config directories, generated-build/generated-code directories, dependency directories, lockfile locations, snapshots, formatting-only files, debug scripts, fixtures, or harnesses, until the relevant gate is closed.
@@ -17,9 +28,9 @@ Run these gates before fixing code. Diagnosis may read files, run existing tests
 
 - If the project is not a git repo, state that no git baseline is available and continue.
 - If the project is a git repo, record the current branch, `HEAD`, and `git status --porcelain=v1 -uall`.
-- Ask the user whether bug-fix work should continue on the current branch or on a new branch. Include your recommendation and wait for the user's explicit choice.
+- Ask the user whether bug-fix work should continue on the current branch, continue on a new branch, or pause for manual branch handling. Use the Decision Question Format and include your recommendation.
 - Do not create, switch, checkout, stash, reset, or commit until the user explicitly confirms that operation.
-- If the worktree is dirty before the branch decision, list the dirty files and explain that switching branches may carry or block those changes. Ask whether to commit first, continue while recording the dirty baseline, or pause for manual cleanup.
+- If the worktree is dirty before the branch decision, list the dirty files and explain that switching branches may carry or block those changes. Ask whether to commit an exact reviewed scope first, continue while recording the dirty baseline, or pause for manual cleanup using the Decision Question Format.
 - If the user chooses to commit first, ask for confirmation of the exact files or scope before committing. Never include unrelated dirty files by default.
 - For any pre-fix commit, show the exact proposed file list first. Exclude unresolved conflicts, unrelated files, local secrets, generated build output, dependency cache files, temporary/debug artifacts, and files with unknown purpose. Run only the validation that is appropriate and available for those pre-existing changes; if validation is unavailable, unknown, or failing, report that status and commit only after the user explicitly accepts it.
 - If the user chooses to continue with dirty files, preserve the dirty baseline exactly as pre-existing user work and exclude it from later fix review and commit scope.
@@ -52,7 +63,7 @@ If the bug belongs to a feature directory whose local artifacts carry `Authority
 
 ### Implementation Commit Gate
 
-Before changing files, ask whether this bug-fix pass may automatically create a git commit after the fix and validation are complete.
+Before changing files, ask whether this bug-fix pass may automatically create a git commit after the fix and validation are complete. Use the Decision Question Format with options such as: no auto-commit; auto-commit after successful validation; pause and decide after the fix.
 
 - If the project is not a git repo, state that automatic commit is unavailable and continue without commit behavior.
 - If the user says no, do not commit in this pass.
@@ -114,7 +125,7 @@ Stop and say so explicitly. List what you tried. Ask the user for: (a) access to
 
 Production and unknown-environment safety:
 
-- In production or unknown environments, perform only read-only diagnosis unless the user explicitly confirms the environment, blast radius, rollback path, and safety of the action.
+- In production or unknown environments, perform only read-only diagnosis unless the user first chooses a non-read-only path using the Decision Question Format and then explicitly confirms the environment, blast radius, rollback path, and safety of the action.
 - Do not add temporary production instrumentation unless it is explicitly approved for this incident, scoped to the minimum surface, reversible, observable, and has a cleanup plan recorded in `diagnosis-report.md`.
 - Do not run destructive, externally visible, data-mutating, payment, notification, permission, migration, or irreversible actions while trying to reproduce a bug unless the environment is isolated or the action is proven rollback-safe and explicitly approved.
 - If safe verification cannot be performed, report the exact blocked verification and residual risk instead of claiming the bug is fixed.
