@@ -35,7 +35,7 @@ dsh web
 npx specworkflow install <project-skills-dir>
 ```
 
-这里填当前 Agent 工具可识别的项目级 skills 目录，例如 `.agents/skills`。
+把 `<project-skills-dir>` 换成当前 Agent 工具可识别的项目级 skills 目录。
 
 ## 快速开始
 
