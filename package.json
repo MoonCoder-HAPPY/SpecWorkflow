@@ -4,6 +4,14 @@
   "description": "Workflow skill pack for DeepSeek Harness: requirement grilling, specs, implementation, delivery review, repair planning, bug diagnosis, and source-backed research.",
   "type": "module",
   "license": "MIT",
+  "homepage": "https://github.com/MoonCoder-HAPPY/SpecWorkflow#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MoonCoder-HAPPY/SpecWorkflow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MoonCoder-HAPPY/SpecWorkflow/issues"
+  },
   "main": "./index.mjs",
   "exports": {
     ".": "./index.mjs",
@@ -40,5 +48,8 @@
     "@deepseek-ai/dsh-skill-filesystem": {
       "optional": true
     }
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }

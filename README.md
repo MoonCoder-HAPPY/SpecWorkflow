@@ -31,11 +31,19 @@ It is intentionally not a heavy process for every request. Small, concrete edits
 ### DSH
 
 ```sh
-dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow
+dsh plugin --profile web add specworkflow
 dsh web
 ```
 
-Replace `web` with the DSH profile you use. For auditable installs, pin a commit:
+Replace `web` with the DSH profile you use.
+
+For unreleased changes or an auditable GitHub snapshot:
+
+```sh
+dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow
+```
+
+Pin a commit when you need exact-source installs:
 
 ```sh
 dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow#<commit>

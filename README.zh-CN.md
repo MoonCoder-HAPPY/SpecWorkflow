@@ -31,11 +31,19 @@ SpecWorkflow 是一套可分享的 workflow skill pack，面向 DeepSeek Harness
 ### DSH
 
 ```sh
-dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow
+dsh plugin --profile web add specworkflow
 dsh web
 ```
 
-如果你使用的不是 `web` profile，把 `web` 换成实际 profile。需要可审计安装时，可以固定 commit：
+如果你使用的不是 `web` profile，把 `web` 换成实际 profile。
+
+如果需要安装尚未发布的改动，或需要可审计的 GitHub 快照：
+
+```sh
+dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow
+```
+
+需要固定精确源码时，可以指定 commit：
 
 ```sh
 dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow#<commit>
