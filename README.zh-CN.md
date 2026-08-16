@@ -20,12 +20,6 @@ SpecWorkflow 是一套可分享的 workflow skill pack，面向 DeepSeek Harness
 | 5 | `fix-review` | 把 must-fix review findings 转成修复 spec 和修复 tickets。 |
 | 调试 | `bugs-fix` | 针对 bug、回归和性能问题做复现、根因定位、修复和证据留存。 |
 
-## 要求
-
-- DSH 安装方式需要 DeepSeek Harness `dsh@0.1.0-rc.6` 或更高版本。
-- 完整 workflow 需要一个仓库工作区，因为产物会写入 `.spec-workflow/<feature-slug>/`。
-- 其它 Agent 需要支持读取 `skill-package/*/SKILL.md` 的 Agent Skills loader。
-
 ## 安装
 
 ### DSH

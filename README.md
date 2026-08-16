@@ -20,12 +20,6 @@ It is intentionally not a heavy process for every request. Small, concrete edits
 | 5 | `fix-review` | Repair specs and repair tickets for must-fix review findings. |
 | Debug | `bugs-fix` | Reproduction, root-cause diagnosis, repair, and fix evidence for bugs or regressions. |
 
-## Requirements
-
-- DeepSeek Harness `dsh@0.1.0-rc.6` or later for DSH installation.
-- A repository workspace for the full workflow, because artifacts are written under `.spec-workflow/<feature-slug>/`.
-- For non-DSH agents, an Agent Skills-compatible loader that can read `skill-package/*/SKILL.md`.
-
 ## Install
 
 ### DSH
