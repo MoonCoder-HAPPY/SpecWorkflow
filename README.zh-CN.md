@@ -164,10 +164,6 @@ dsh plugin --profile web remove specworkflow
 
 把 `web` 换成你实际安装的 profile。
 
-## 兼容性
-
-DSH wrapper 已在本机 `dsh@0.1.0-rc.6` 验证通过。本包是 host-only skill pack，不包含 Web UI、常驻工具、凭据管理或后台服务，只注册一个指向内置 `skill-package/` 的只读 skill provider。
-
 ## 许可证
 
 MIT. See [LICENSE](LICENSE).

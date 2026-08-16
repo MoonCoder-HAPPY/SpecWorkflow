@@ -164,10 +164,6 @@ dsh plugin --profile web remove specworkflow
 
 Replace `web` with the profile you installed into.
 
-## Compatibility
-
-The DSH wrapper has been verified locally with `dsh@0.1.0-rc.6`. The package is host-only and does not ship a Web UI, resident tools, credentials, or background services. It registers a read-only skill provider over the bundled `skill-package/` directory.
-
 ## License
 
 MIT. See [LICENSE](LICENSE).
