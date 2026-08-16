@@ -87,25 +87,27 @@ SpecWorkflow should route that kind of request to direct implementation instead 
 
 ## Workflow
 
-Start with the request in front of you, decide how much structure it actually needs, then keep every artifact for that piece of work under the same `.spec-workflow/<feature-slug>/` folder.
+SpecWorkflow does not start by writing a spec. It starts by deciding whether the request deserves one. Small, obvious work such as copy edits, style tweaks, or a missing guard should stay direct.
+
+The full route is for work with product meaning, data semantics, permission boundaries, cross-module impact, release risk, or enough ambiguity that guessing would be expensive. Once a request enters the route, keep its artifacts under one `.spec-workflow/<feature-slug>/` folder so every later pass has the same source of context.
 
 ```text
 to-grill -> to-spec -> spec-do -> do-review -> fix-review -> spec-do repair -> do-review
 ```
 
-Use `to-grill` when the request still has unanswered product, data, permission, UX, or risk questions. It should not sit there asking what the repo can answer by inspection. Its job is to separate obvious direct edits from work that needs a real spec, then leave a short requirements conclusion when the work moves forward.
+`to-grill` turns a vague request into something solid. It should inspect the repo before asking questions, separate facts the code can answer from decisions only the user can make, and decide whether the work should be direct, deferred, or promoted into a spec. When it hands off, it leaves a requirements conclusion that the next stage can actually use.
 
-Use `to-spec` once the requirement is stable enough that another agent could implement it without guessing. The spec should say what is in scope, what is not, what data or permissions are involved, how the user-facing behavior should work, and how the result will be checked. When the work is a change to an existing spec, write the amendment and its impact instead of pretending it is a brand-new feature.
+`to-spec` turns that conclusion into an implementation contract. A useful spec names the scope, the non-goals, the affected modules, the data and permission rules, the user-visible behavior, and the evidence that will prove the work is done. If the task is changing an existing spec, it records the amendment and its impact instead of pretending the work starts from a blank page.
 
-Use `spec-do` for the actual implementation pass. It should check the branch and worktree first, ask about auto-commit only when needed, then implement against the approved spec or repair plan. Tests and temporary evidence can be collected under `.spec-workflow`, but real project tests belong in the project's normal test directories. Business logic should be wired for real, not faked just to get a green run.
+`spec-do` is the first stage that should touch production code. It checks the branch, dirty worktree, and auto-commit permission before implementation, then works from the approved spec, tickets, amendment, or repair plan. Temporary evidence can live under `.spec-workflow`, but durable tests belong in the project's own test tree. Business logic should be wired for real, not mocked away just to make a validation run pass.
 
-Use `do-review` when implementation claims to be done. This pass is deliberately judgmental: compare the original request, spec, code, tests, and evidence, then say whether the work is ready, needs repair, or should stop for a user decision. It should not quietly expand scope or fix code while reviewing.
+When implementation claims to be finished, `do-review` decides whether that claim holds. It compares the original request, spec, code diff, tests, and evidence, then looks for missed requirements, regressions, edge cases, and acceptance gaps. Review is not a quiet repair pass and not a place to expand scope; its job is a clear ship / no-ship judgment.
 
-Use `fix-review` only for findings that really need another implementation pass. It turns review findings into a focused repair plan, then sends that plan back to `spec-do`. After the repair, run `do-review` again. The loop ends when the work is shippable or when the next decision is genuinely the user's call.
+If the review finds must-fix issues, `fix-review` turns them into a focused repair plan. It cares about root cause, priority, verification, and whether the repair should be split into tickets. That plan goes back to `spec-do`, and the repair returns to `do-review`. The loop stays short: repair what blocks delivery, then review again.
 
-`deep-research` and `bugs-fix` sit beside the main route. Use `deep-research` when an answer depends on outside facts or primary sources. Use `bugs-fix` when the starting point is a failure, regression, or performance problem rather than a planned feature.
+`deep-research` and `bugs-fix` sit beside the main route rather than inside it. Reach for `deep-research` when the answer depends on primary sources, official docs, API behavior, standards, or external facts. Start with `bugs-fix` when the problem is already a failure, regression, exception, or performance issue; reproduce first, then diagnose the root cause.
 
-Goal Mode is a convenience switch for one spec at a time. If the user enables it, the agent can keep moving through implementation, review, repair planning, repair implementation, and another review without pausing at every handoff. It still stops for product choices, safety concerns, git decisions, validation gaps, environment problems, or scope changes.
+Goal Mode is a continuous-execution switch for one spec at a time. Once the user explicitly enables it, the agent can move through implementation, review, repair planning, repair implementation, and another review without pausing at every handoff. It is not unlimited permission: product choices, safety concerns, git decisions, validation gaps, environment problems, and scope changes still stop the run.
 
 ## Directory Output
 
