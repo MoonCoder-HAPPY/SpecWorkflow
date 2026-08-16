@@ -48,7 +48,7 @@ dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow#<commit>
 把这段交给你的 Agent：
 
 ```text
-把 https://github.com/MoonCoder-HAPPY/SpecWorkflow 的 skill-package/* 安装到当前 Agent 工具可识别的项目级 skills 目录中。保持目录名不变。
+安装 npm 包 specworkflow，然后把包内 skill-package/* 目录复制到当前 Agent 工具可识别的项目级 skills 目录中。保持目录名不变。
 ```
 
 如果只想在当前项目使用 SpecWorkflow，就安装到项目级目录。

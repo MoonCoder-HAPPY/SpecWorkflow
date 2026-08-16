@@ -48,7 +48,7 @@ dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow#<commit>
 Ask your agent:
 
 ```text
-Install https://github.com/MoonCoder-HAPPY/SpecWorkflow skill-package/* into the project-level skills directory recognized by your current agent tool. Keep folder names unchanged.
+Install the npm package specworkflow, then copy its skill-package/* directories into the project-level skills directory recognized by your current agent tool. Keep folder names unchanged.
 ```
 
 Use project-level installation when you want SpecWorkflow to apply only to the current repository.
