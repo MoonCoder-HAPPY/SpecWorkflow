@@ -32,10 +32,10 @@ dsh web
 ### 其它 Agent
 
 ```sh
-npx specworkflow install <project-skills-dir>
+npx specworkflow install codex
 ```
 
-把 `<project-skills-dir>` 换成当前 Agent 工具可识别的项目级 skills 目录。
+需要时把 `codex` 换成 `claude-code`、`cursor`、`gemini`、`copilot`、`vscode`、`opencode`、`windsurf`、`cline`、`kiro`、`kilo`、`dsh`，或当前工具可识别的项目级 skills 路径。
 
 ## 快速开始
 

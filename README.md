@@ -32,10 +32,10 @@ dsh web
 ### Other Agents
 
 ```sh
-npx specworkflow install <project-skills-dir>
+npx specworkflow install codex
 ```
 
-Replace `<project-skills-dir>` with the project-level skills directory recognized by your current agent tool.
+Replace `codex` with `claude-code`, `cursor`, `gemini`, `copilot`, `vscode`, `opencode`, `windsurf`, `cline`, `kiro`, `kilo`, `dsh`, or a project-level skills path when needed.
 
 ## Quick Start
 

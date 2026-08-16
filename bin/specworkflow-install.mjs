@@ -6,19 +6,108 @@ import { fileURLToPath } from 'node:url'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const source = join(root, 'skill-package')
 
-function usage() {
-  console.error('Usage: npx specworkflow install <project-skills-dir>')
-  console.error('Example: npx specworkflow install .agents/skills')
+const presetGroups = [
+  {
+    target: '.agents/skills',
+    aliases: [
+      'agent',
+      'agents',
+      'agent-skills',
+      'antigravity',
+      'codex',
+      'gemini',
+      'gemini-cli',
+      'google-antigravity',
+      'openai',
+    ],
+    label: 'codex, gemini, antigravity, agents -> .agents/skills',
+  },
+  {
+    target: '.github/skills',
+    aliases: ['copilot', 'github-copilot', 'vs-code', 'vscode'],
+    label: 'copilot, vscode                   -> .github/skills',
+  },
+  {
+    target: '.cursor/skills',
+    aliases: ['cursor', 'cursor-agent', 'cursor-native'],
+    label: 'cursor                            -> .cursor/skills',
+  },
+  {
+    target: '.claude/skills',
+    aliases: ['claude', 'claude-code', 'claudecode'],
+    label: 'claude, claude-code                 -> .claude/skills',
+  },
+  {
+    target: '.dsh/skills',
+    aliases: ['deepseek', 'deepseek-harness', 'dsh'],
+    label: 'dsh, deepseek                      -> .dsh/skills',
+  },
+  {
+    target: '.opencode/skills',
+    aliases: ['open-code', 'opencode'],
+    label: 'opencode                           -> .opencode/skills',
+  },
+  {
+    target: '.windsurf/skills',
+    aliases: ['cascade', 'windsurf'],
+    label: 'windsurf, cascade                  -> .windsurf/skills',
+  },
+  {
+    target: '.cline/skills',
+    aliases: ['cline'],
+    label: 'cline                              -> .cline/skills',
+  },
+  {
+    target: '.kiro/skills',
+    aliases: ['kiro'],
+    label: 'kiro                               -> .kiro/skills',
+  },
+  {
+    target: '.kilo/skills',
+    aliases: ['kilo', 'kilo-code', 'kilocode'],
+    label: 'kilo, kilo-code                    -> .kilo/skills',
+  },
+]
+
+const presets = new Map()
+
+for (const group of presetGroups) {
+  for (const alias of group.aliases) {
+    presets.set(alias, group.target)
+  }
 }
 
-const [, , command, targetArg] = process.argv
+function usage() {
+  console.error('Usage:')
+  console.error('  npx specworkflow install codex')
+  console.error('  npx specworkflow install claude-code')
+  console.error('  npx specworkflow install cursor')
+  console.error('  npx specworkflow install copilot')
+  console.error('  npx specworkflow install dsh')
+  console.error('  npx specworkflow install <project-skills-dir>')
+  console.error('')
+  console.error('Presets:')
+  for (const group of presetGroups) {
+    console.error(`  ${group.label}`)
+  }
+}
 
-if (command !== 'install' || targetArg === undefined) {
+const [, , command, ...targetParts] = process.argv
+
+if (command === '--help' || command === '-h') {
+  usage()
+  process.exit(0)
+}
+
+if (command !== 'install' || targetParts.length === 0) {
   usage()
   process.exit(1)
 }
 
-const target = resolve(process.cwd(), targetArg)
+const targetArg = targetParts.length === 1 ? targetParts[0] : targetParts.join(' ')
+const normalizedTarget = targetArg.trim().toLowerCase().replace(/[\s_]+/gu, '-')
+const targetPath = presets.get(normalizedTarget) ?? targetArg
+const target = resolve(process.cwd(), targetPath)
 const entries = await readdir(source, { withFileTypes: true })
 const skills = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name)
 
@@ -29,6 +118,10 @@ for (const skill of skills) {
   const to = join(target, skill)
   await rm(to, { recursive: true, force: true })
   await cp(from, to, { recursive: true })
+}
+
+if (presets.has(normalizedTarget)) {
+  console.log(`Resolved ${targetArg} to ${targetPath}`)
 }
 
 console.log(`Installed ${skills.length} SpecWorkflow skills into ${target}`)
