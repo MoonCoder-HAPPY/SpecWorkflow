@@ -87,7 +87,7 @@ SpecWorkflow should route that kind of request to direct implementation instead 
 
 ## Workflow
 
-This workflow is meant to guide route selection, not turn every request into a ceremony. Start with the request in front of you, decide how much structure it actually needs, then keep every artifact for that piece of work under the same `.spec-workflow/<feature-slug>/` folder.
+Start with the request in front of you, decide how much structure it actually needs, then keep every artifact for that piece of work under the same `.spec-workflow/<feature-slug>/` folder.
 
 ```text
 to-grill -> to-spec -> spec-do -> do-review -> fix-review -> spec-do repair -> do-review
