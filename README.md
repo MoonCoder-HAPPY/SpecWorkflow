@@ -39,16 +39,20 @@ Replace `codex` with another preset when needed:
 
 | Input | Installs into |
 | --- | --- |
-| `codex`, `openai`, `agents`, `agent`, `agent-skills`, `gemini`, `gemini-cli`, `antigravity`, `google-antigravity` | `.agents/skills` |
+| `codex`, `openai`, `agents`, `agent`, `agent-skills`, `agents-md`, `gemini`, `gemini-cli`, `antigravity`, `google-antigravity`, `goose`, `zed`, `amp`, `sourcegraph-amp` | `.agents/skills` |
 | `claude`, `claude-code`, `claudecode` | `.claude/skills` |
 | `cursor`, `cursor-agent`, `cursor-native` | `.cursor/skills` |
 | `copilot`, `github-copilot`, `vscode`, `vs-code` | `.github/skills` |
 | `dsh`, `deepseek`, `deepseek-harness` | `.dsh/skills` |
 | `opencode`, `open-code` | `.opencode/skills` |
 | `windsurf`, `cascade` | `.windsurf/skills` |
-| `cline` | `.cline/skills` |
+| `cline`, `claudine` | `.cline/skills` |
+| `roo`, `roo-code`, `roocode` | `.roo/skills` |
+| `qwen`, `qwen-code`, `qwencode` | `.qwen/skills` |
 | `kiro` | `.kiro/skills` |
 | `kilo`, `kilo-code`, `kilocode` | `.kilo/skills` |
+| `augment`, `augment-code`, `augmentcode`, `auggie` | `.augment/skills` |
+| `openclaw`, `claw` | `skills` |
 
 Unknown plain names are rejected so a typo does not create the wrong folder. For unsupported agents, pass an explicit project-level skills path:
 

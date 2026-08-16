@@ -39,16 +39,20 @@ npx specworkflow install codex
 
 | 输入 | 安装位置 |
 | --- | --- |
-| `codex`, `openai`, `agents`, `agent`, `agent-skills`, `gemini`, `gemini-cli`, `antigravity`, `google-antigravity` | `.agents/skills` |
+| `codex`, `openai`, `agents`, `agent`, `agent-skills`, `agents-md`, `gemini`, `gemini-cli`, `antigravity`, `google-antigravity`, `goose`, `zed`, `amp`, `sourcegraph-amp` | `.agents/skills` |
 | `claude`, `claude-code`, `claudecode` | `.claude/skills` |
 | `cursor`, `cursor-agent`, `cursor-native` | `.cursor/skills` |
 | `copilot`, `github-copilot`, `vscode`, `vs-code` | `.github/skills` |
 | `dsh`, `deepseek`, `deepseek-harness` | `.dsh/skills` |
 | `opencode`, `open-code` | `.opencode/skills` |
 | `windsurf`, `cascade` | `.windsurf/skills` |
-| `cline` | `.cline/skills` |
+| `cline`, `claudine` | `.cline/skills` |
+| `roo`, `roo-code`, `roocode` | `.roo/skills` |
+| `qwen`, `qwen-code`, `qwencode` | `.qwen/skills` |
 | `kiro` | `.kiro/skills` |
 | `kilo`, `kilo-code`, `kilocode` | `.kilo/skills` |
+| `augment`, `augment-code`, `augmentcode`, `auggie` | `.augment/skills` |
+| `openclaw`, `claw` | `skills` |
 
 未识别的纯名称会直接报错，避免因为拼错而创建错误目录。如果当前工具不在预设里，请传入明确的项目级 skills 路径：
 

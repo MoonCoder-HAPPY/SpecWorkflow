@@ -13,14 +13,19 @@ const presetGroups = [
       'agent',
       'agents',
       'agent-skills',
+      'agents-md',
+      'amp',
       'antigravity',
       'codex',
       'gemini',
       'gemini-cli',
       'google-antigravity',
+      'goose',
       'openai',
+      'sourcegraph-amp',
+      'zed',
     ],
-    label: 'codex, gemini, antigravity, agents -> .agents/skills',
+    label: 'codex, gemini, goose, zed, amp -> .agents/skills',
   },
   {
     target: '.github/skills',
@@ -54,8 +59,18 @@ const presetGroups = [
   },
   {
     target: '.cline/skills',
-    aliases: ['cline'],
-    label: 'cline                              -> .cline/skills',
+    aliases: ['claudine', 'cline'],
+    label: 'cline, claudine                    -> .cline/skills',
+  },
+  {
+    target: '.roo/skills',
+    aliases: ['roo', 'roo-code', 'roocode'],
+    label: 'roo, roo-code                      -> .roo/skills',
+  },
+  {
+    target: '.qwen/skills',
+    aliases: ['qwen', 'qwen-code', 'qwencode'],
+    label: 'qwen, qwen-code                    -> .qwen/skills',
   },
   {
     target: '.kiro/skills',
@@ -66,6 +81,16 @@ const presetGroups = [
     target: '.kilo/skills',
     aliases: ['kilo', 'kilo-code', 'kilocode'],
     label: 'kilo, kilo-code                    -> .kilo/skills',
+  },
+  {
+    target: '.augment/skills',
+    aliases: ['auggie', 'augment', 'augment-code', 'augmentcode'],
+    label: 'augment, auggie                    -> .augment/skills',
+  },
+  {
+    target: 'skills',
+    aliases: ['openclaw', 'claw'],
+    label: 'openclaw                           -> skills',
   },
 ]
 
