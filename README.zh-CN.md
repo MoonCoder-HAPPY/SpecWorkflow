@@ -71,25 +71,25 @@ dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow#<commit>
 
 ## 工作流
 
-读图时按从左到右理解。上方是直接实施分支，中间是完整 spec 流程，下方是 review 后的修复闭环。
+这张图不是让每个需求都走一遍仪式，而是告诉 Agent 怎么判断路线：先看手上的请求到底需要多少结构，再把同一件事的产物放到同一个 `.spec-workflow/<feature-slug>/` 目录下。
 
 ```text
 to-grill -> to-spec -> spec-do -> do-review -> fix-review -> spec-do repair -> do-review
 ```
 
-`to-grill` 是模糊或高风险工作的入口。它读取用户需求、仓库上下文和已知约束，判断任务应该直接处理，还是进入完整 workflow。进入后，它会把需求探索结论写入 `.spec-workflow/<feature-slug>/requirements.md`。
+请求里还有产品、数据、权限、交互或风险问题时，用 `to-grill`。它不应该把能从仓库里查到的问题甩给用户；它要做的是判断这件事能不能直接改，还是需要进入正式 spec。进入下一步前，留下简短的需求结论。
 
-`to-spec` 把已经收口的需求整理成可实施 spec。它补齐范围、非目标、数据语义、权限、交互行为、验收标准、风险和验证方式。如果是在调整已有 spec，它会先写修订与影响说明，再继续实施。
+需求已经稳定到“另一个 Agent 不用猜也能做”时，用 `to-spec`。spec 里要写清范围、非目标、数据和权限、用户看到的行为，以及怎么验收。如果是在改已有 spec，就写修订和影响，不要假装这是一个全新的功能。
 
-`spec-do` 根据已批准的 spec、tickets、修订或修复计划实施。写代码前，它会处理分支选择、脏工作区检查和是否自动提交。实施中不能 mock 系统业务逻辑；验证证据和实施记录都围绕当前 feature 目录保存。
+真正写代码时，用 `spec-do`。它先处理分支、脏工作区和是否自动提交，再按已批准的 spec 或修复计划实施。临时证据可以放进 `.spec-workflow`，但项目长期测试要放回项目自己的测试目录。业务逻辑要真实接上，不能为了过测试随手 mock。
 
-`do-review` 判断当前工作是否真的可交付。它不扩大 scope，也不改代码。只要存在 must-fix finding，就进入 `fix-review`。
+实现说自己完成后，用 `do-review`。这一轮就是严格检查：拿原始需求、spec、代码、测试和证据对照，判断能不能交付、是否需要修复，或者是否必须停下来让用户决定。review 不负责偷偷扩大范围，也不边审边改。
 
-`fix-review` 把 must-fix findings 转成修复 spec 和可选修复 tickets。修复计划回到 `spec-do` 实施，再回到 `do-review` 复查，直到可交付或需要人工决策。
+确实需要再修一轮时，用 `fix-review`。它把 must-fix finding 变成聚焦的修复计划，再交回 `spec-do`。修完以后再回到 `do-review`，直到可以交付，或者下一步真的需要用户拍板。
 
-`deep-research` 和 `bugs-fix` 是支线。外部事实会影响判断时，用 `deep-research`；失败、回归和性能问题，用 `bugs-fix`。
+`deep-research` 和 `bugs-fix` 不在主链上，但经常会插进来。判断依赖外部事实或一手资料时，用 `deep-research`；起点是失败、回归或性能问题时，用 `bugs-fix`。
 
-Goal Mode 只对当前 spec 生效，且必须由用户显式选择。启用后，Agent 可以自动串联实施、review、修复规划、修复实施和再次 review；遇到目标完成、修复预算耗尽，或产品、安全、git、验证、环境、scope 决策时停止。
+Goal Mode 是单个 spec 的便利开关。用户启用后，Agent 可以连续跑实施、review、修复规划、修复实施和再次 review，不必每个交接点都停下来问。遇到产品选择、安全风险、git 决策、验证缺口、环境问题或 scope 变化时，仍然要停。
 
 ## 目录产出
 
@@ -112,33 +112,6 @@ SpecWorkflow 把 workflow 文件放在 `.spec-workflow` 下，避免把项目代
 ```
 
 项目长期测试仍然放在项目原本的测试目录，不放进 `.spec-workflow`。
-
-## 边界
-
-- SpecWorkflow 不替代产品判断。用户选择会先从合理性、安全、权限、性能、可维护性、范围匹配、验证成本和可逆性等角度审核，再继续执行。
-- 简单低风险修改不应该被强制进入完整 workflow。
-- 实施阶段不能为了让测试通过而 mock 真实系统业务逻辑。
-- Goal Mode 必须由用户显式选择，且只作用于当前 spec。
-- DSH 包只注册 skill provider，不注册模型工具、不管理凭据，也不加入常驻后台服务。
-
-## 包结构
-
-```text
-skill-package/
-  to-grill/
-  to-spec/
-  spec-do/
-  do-review/
-  fix-review/
-  bugs-fix/
-  deep-research/
-
-index.mjs
-cordis.patch.yml
-package.json
-```
-
-在 DSH 中，`index.mjs` 会通过原生 `FileSystemSkillProvider` 注册 `skill-package/`。在其它 Agent 中，`skill-package/` 下每个目录都是一个独立 Agent Skill，包含自己的 `SKILL.md`。
 
 ## 验证
 
