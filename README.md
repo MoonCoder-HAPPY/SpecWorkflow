@@ -29,20 +29,6 @@ dsh plugin --profile web add specworkflow
 dsh web
 ```
 
-Replace `web` with the DSH profile you use.
-
-For unreleased changes or an auditable GitHub snapshot:
-
-```sh
-dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow
-```
-
-Pin a commit when you need exact-source installs:
-
-```sh
-dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow#<commit>
-```
-
 ### Other Agents
 
 Ask your agent:

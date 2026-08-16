@@ -29,20 +29,6 @@ dsh plugin --profile web add specworkflow
 dsh web
 ```
 
-如果你使用的不是 `web` profile，把 `web` 换成实际 profile。
-
-如果需要安装尚未发布的改动，或需要可审计的 GitHub 快照：
-
-```sh
-dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow
-```
-
-需要固定精确源码时，可以指定 commit：
-
-```sh
-dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow#<commit>
-```
-
 ### 其它 Agent
 
 把这段交给你的 Agent：
