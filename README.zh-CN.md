@@ -57,13 +57,24 @@ Goal Mode 只对当前 spec 生效，且必须由用户显式选择。启用后�
 
 ## 快速开始
 
-把这段交给你的 Agent
+### DSH
+
+```sh
+dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow
+dsh web
+```
+
+如果你使用的不是 `web` profile，把 `web` 换成实际 profile 名。
+
+### 其它 Agent
+
+把这段交给你的 Agent：
 
 ```text
 把 https://github.com/MoonCoder-HAPPY/SpecWorkflow 的 skill-package/* 安装到当前 Agent 工具可识别的项目级 skills 目录中。保持目录名不变。
 ```
 
-如果只想在当前项目使用 SpecWorkflow，就安装到项目级目录。只有明确想让所有项目都能使用时，才安装到全局 skills 目录。
+如果只想在当前项目使用 SpecWorkflow，就安装到项目级目录。
 
 ## 目录产出
 

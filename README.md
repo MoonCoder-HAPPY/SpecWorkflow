@@ -57,13 +57,24 @@ Goal Mode is opt-in per spec. When enabled, the agent may continue through imple
 
 ## Quick Start
 
-Ask your agent
+### DSH
+
+```sh
+dsh plugin --profile web add github:MoonCoder-HAPPY/SpecWorkflow
+dsh web
+```
+
+Replace `web` with your actual DSH profile when needed.
+
+### Other Agents
+
+Ask your agent:
 
 ```text
 Install https://github.com/MoonCoder-HAPPY/SpecWorkflow skill-package/* into the project-level skills directory recognized by your current agent tool. Keep folder names unchanged.
 ```
 
-Use project-level installation when you want SpecWorkflow to apply only to the current repository. Use a global skills directory only if you intentionally want these skills available everywhere.
+Use project-level installation when you want SpecWorkflow to apply only to the current repository.
 
 ## Artifact Storage
 
