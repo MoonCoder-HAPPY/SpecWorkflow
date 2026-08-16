@@ -31,13 +31,11 @@ dsh web
 
 ### Other Agents
 
-Ask your agent:
-
-```text
-Install the npm package specworkflow, then copy its skill-package/* directories into the project-level skills directory recognized by your current agent tool. Keep folder names unchanged.
+```sh
+npx specworkflow install <project-skills-dir>
 ```
 
-Use project-level installation when you want SpecWorkflow to apply only to the current repository.
+Use the project-level skills directory recognized by your current agent tool, for example `.agents/skills`.
 
 ## Quick Start
 

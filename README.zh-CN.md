@@ -31,13 +31,11 @@ dsh web
 
 ### 其它 Agent
 
-把这段交给你的 Agent：
-
-```text
-安装 npm 包 specworkflow，然后把包内 skill-package/* 目录复制到当前 Agent 工具可识别的项目级 skills 目录中。保持目录名不变。
+```sh
+npx specworkflow install <project-skills-dir>
 ```
 
-如果只想在当前项目使用 SpecWorkflow，就安装到项目级目录。
+这里填当前 Agent 工具可识别的项目级 skills 目录，例如 `.agents/skills`。
 
 ## 快速开始
 

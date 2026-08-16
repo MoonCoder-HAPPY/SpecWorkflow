@@ -13,6 +13,9 @@
     "url": "https://github.com/MoonCoder-HAPPY/SpecWorkflow/issues"
   },
   "main": "./index.mjs",
+  "bin": {
+    "specworkflow": "bin/specworkflow-install.mjs"
+  },
   "exports": {
     ".": "./index.mjs",
     "./cordis.patch.yml": "./cordis.patch.yml",
@@ -20,6 +23,7 @@
   },
   "files": [
     "index.mjs",
+    "bin",
     "cordis.patch.yml",
     "skill-package",
     "assets",
