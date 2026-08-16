@@ -35,30 +35,39 @@ dsh web
 npx specworkflow install codex
 ```
 
+Install globally with `-g`:
+
+```sh
+npx specworkflow install -g codex
+```
+
 Replace `codex` with another preset when needed:
 
-| Input | Installs into |
-| --- | --- |
-| `codex`, `openai`, `agents`, `agent`, `agent-skills`, `agents-md`, `gemini`, `gemini-cli`, `antigravity`, `google-antigravity`, `goose`, `zed`, `amp`, `sourcegraph-amp` | `.agents/skills` |
-| `claude`, `claude-code`, `claudecode` | `.claude/skills` |
-| `cursor`, `cursor-agent`, `cursor-native` | `.cursor/skills` |
-| `copilot`, `github-copilot`, `vscode`, `vs-code` | `.github/skills` |
-| `dsh`, `deepseek`, `deepseek-harness` | `.dsh/skills` |
-| `opencode`, `open-code` | `.opencode/skills` |
-| `windsurf`, `cascade` | `.windsurf/skills` |
-| `cline`, `claudine` | `.cline/skills` |
-| `roo`, `roo-code`, `roocode` | `.roo/skills` |
-| `qwen`, `qwen-code`, `qwencode` | `.qwen/skills` |
-| `kiro` | `.kiro/skills` |
-| `kilo`, `kilo-code`, `kilocode` | `.kilo/skills` |
-| `augment`, `augment-code`, `augmentcode`, `auggie` | `.augment/skills` |
-| `openclaw`, `claw` | `skills` |
+| Input | Project install | Global install with `-g` |
+| --- | --- | --- |
+| `codex`, `openai`, `agents`, `agent`, `agent-skills`, `agents-md`, `goose`, `zed`, `amp`, `sourcegraph-amp` | `.agents/skills` | `~/.agents/skills` |
+| `gemini`, `gemini-cli`, `antigravity`, `google-antigravity` | `.agents/skills` | `~/.gemini/antigravity/skills` |
+| `claude`, `claude-code`, `claudecode` | `.claude/skills` | `~/.claude/skills` |
+| `cursor`, `cursor-agent`, `cursor-native` | `.cursor/skills` | `~/.cursor/skills` |
+| `copilot`, `github-copilot`, `vscode`, `vs-code` | `.github/skills` | `~/.github/skills` |
+| `dsh`, `deepseek`, `deepseek-harness` | `.dsh/skills` | `~/.dsh/skills` |
+| `opencode`, `open-code` | `.opencode/skills` | `~/.opencode/skills` |
+| `windsurf`, `cascade` | `.windsurf/skills` | `~/.windsurf/skills` |
+| `cline`, `claudine` | `.cline/skills` | `~/.cline/skills` |
+| `roo`, `roo-code`, `roocode` | `.roo/skills` | `~/.roo/skills` |
+| `qwen`, `qwen-code`, `qwencode` | `.qwen/skills` | `~/.qwen/skills` |
+| `kiro` | `.kiro/skills` | `~/.kiro/skills` |
+| `kilo`, `kilo-code`, `kilocode` | `.kilo/skills` | `~/.kilo/skills` |
+| `augment`, `augment-code`, `augmentcode`, `auggie` | `.augment/skills` | `~/.augment/skills` |
+| `openclaw`, `claw` | `skills` | `~/.openclaw/skills` |
 
 Unknown plain names are rejected so a typo does not create the wrong folder. For unsupported agents, pass an explicit project-level skills path:
 
 ```sh
 npx specworkflow install .my-agent/skills
 ```
+
+With `-g`, relative explicit paths are resolved from your home directory.
 
 ## Quick Start
 

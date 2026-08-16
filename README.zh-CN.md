@@ -35,30 +35,39 @@ dsh web
 npx specworkflow install codex
 ```
 
+使用 `-g` 安装到全局目录：
+
+```sh
+npx specworkflow install -g codex
+```
+
 需要时把 `codex` 换成其它预设：
 
-| 输入 | 安装位置 |
-| --- | --- |
-| `codex`, `openai`, `agents`, `agent`, `agent-skills`, `agents-md`, `gemini`, `gemini-cli`, `antigravity`, `google-antigravity`, `goose`, `zed`, `amp`, `sourcegraph-amp` | `.agents/skills` |
-| `claude`, `claude-code`, `claudecode` | `.claude/skills` |
-| `cursor`, `cursor-agent`, `cursor-native` | `.cursor/skills` |
-| `copilot`, `github-copilot`, `vscode`, `vs-code` | `.github/skills` |
-| `dsh`, `deepseek`, `deepseek-harness` | `.dsh/skills` |
-| `opencode`, `open-code` | `.opencode/skills` |
-| `windsurf`, `cascade` | `.windsurf/skills` |
-| `cline`, `claudine` | `.cline/skills` |
-| `roo`, `roo-code`, `roocode` | `.roo/skills` |
-| `qwen`, `qwen-code`, `qwencode` | `.qwen/skills` |
-| `kiro` | `.kiro/skills` |
-| `kilo`, `kilo-code`, `kilocode` | `.kilo/skills` |
-| `augment`, `augment-code`, `augmentcode`, `auggie` | `.augment/skills` |
-| `openclaw`, `claw` | `skills` |
+| 输入 | 项目安装位置 | `-g` 全局安装位置 |
+| --- | --- | --- |
+| `codex`, `openai`, `agents`, `agent`, `agent-skills`, `agents-md`, `goose`, `zed`, `amp`, `sourcegraph-amp` | `.agents/skills` | `~/.agents/skills` |
+| `gemini`, `gemini-cli`, `antigravity`, `google-antigravity` | `.agents/skills` | `~/.gemini/antigravity/skills` |
+| `claude`, `claude-code`, `claudecode` | `.claude/skills` | `~/.claude/skills` |
+| `cursor`, `cursor-agent`, `cursor-native` | `.cursor/skills` | `~/.cursor/skills` |
+| `copilot`, `github-copilot`, `vscode`, `vs-code` | `.github/skills` | `~/.github/skills` |
+| `dsh`, `deepseek`, `deepseek-harness` | `.dsh/skills` | `~/.dsh/skills` |
+| `opencode`, `open-code` | `.opencode/skills` | `~/.opencode/skills` |
+| `windsurf`, `cascade` | `.windsurf/skills` | `~/.windsurf/skills` |
+| `cline`, `claudine` | `.cline/skills` | `~/.cline/skills` |
+| `roo`, `roo-code`, `roocode` | `.roo/skills` | `~/.roo/skills` |
+| `qwen`, `qwen-code`, `qwencode` | `.qwen/skills` | `~/.qwen/skills` |
+| `kiro` | `.kiro/skills` | `~/.kiro/skills` |
+| `kilo`, `kilo-code`, `kilocode` | `.kilo/skills` | `~/.kilo/skills` |
+| `augment`, `augment-code`, `augmentcode`, `auggie` | `.augment/skills` | `~/.augment/skills` |
+| `openclaw`, `claw` | `skills` | `~/.openclaw/skills` |
 
 未识别的纯名称会直接报错，避免因为拼错而创建错误目录。如果当前工具不在预设里，请传入明确的项目级 skills 路径：
 
 ```sh
 npx specworkflow install .my-agent/skills
 ```
+
+带 `-g` 时，相对显式路径会从用户 home 目录解析。
 
 ## 快速开始
 

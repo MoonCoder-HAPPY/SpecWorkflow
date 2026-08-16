@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { cp, mkdir, readdir, rm } from 'node:fs/promises'
+import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -8,89 +9,105 @@ const source = join(root, 'skill-package')
 
 const presetGroups = [
   {
-    target: '.agents/skills',
+    projectTarget: '.agents/skills',
+    globalTarget: '.agents/skills',
     aliases: [
       'agent',
       'agents',
       'agent-skills',
       'agents-md',
       'amp',
-      'antigravity',
       'codex',
-      'gemini',
-      'gemini-cli',
-      'google-antigravity',
       'goose',
       'openai',
       'sourcegraph-amp',
       'zed',
     ],
-    label: 'codex, gemini, goose, zed, amp -> .agents/skills',
+    label: 'codex, goose, zed, amp -> .agents/skills',
   },
   {
-    target: '.github/skills',
+    projectTarget: '.github/skills',
+    globalTarget: '.github/skills',
     aliases: ['copilot', 'github-copilot', 'vs-code', 'vscode'],
     label: 'copilot, vscode                   -> .github/skills',
   },
   {
-    target: '.cursor/skills',
+    projectTarget: '.cursor/skills',
+    globalTarget: '.cursor/skills',
     aliases: ['cursor', 'cursor-agent', 'cursor-native'],
     label: 'cursor                            -> .cursor/skills',
   },
   {
-    target: '.claude/skills',
+    projectTarget: '.claude/skills',
+    globalTarget: '.claude/skills',
     aliases: ['claude', 'claude-code', 'claudecode'],
     label: 'claude, claude-code                 -> .claude/skills',
   },
   {
-    target: '.dsh/skills',
+    projectTarget: '.dsh/skills',
+    globalTarget: '.dsh/skills',
     aliases: ['deepseek', 'deepseek-harness', 'dsh'],
     label: 'dsh, deepseek                      -> .dsh/skills',
   },
   {
-    target: '.opencode/skills',
+    projectTarget: '.opencode/skills',
+    globalTarget: '.opencode/skills',
     aliases: ['open-code', 'opencode'],
     label: 'opencode                           -> .opencode/skills',
   },
   {
-    target: '.windsurf/skills',
+    projectTarget: '.windsurf/skills',
+    globalTarget: '.windsurf/skills',
     aliases: ['cascade', 'windsurf'],
     label: 'windsurf, cascade                  -> .windsurf/skills',
   },
   {
-    target: '.cline/skills',
+    projectTarget: '.cline/skills',
+    globalTarget: '.cline/skills',
     aliases: ['claudine', 'cline'],
     label: 'cline, claudine                    -> .cline/skills',
   },
   {
-    target: '.roo/skills',
+    projectTarget: '.roo/skills',
+    globalTarget: '.roo/skills',
     aliases: ['roo', 'roo-code', 'roocode'],
     label: 'roo, roo-code                      -> .roo/skills',
   },
   {
-    target: '.qwen/skills',
+    projectTarget: '.qwen/skills',
+    globalTarget: '.qwen/skills',
     aliases: ['qwen', 'qwen-code', 'qwencode'],
     label: 'qwen, qwen-code                    -> .qwen/skills',
   },
   {
-    target: '.kiro/skills',
+    projectTarget: '.kiro/skills',
+    globalTarget: '.kiro/skills',
     aliases: ['kiro'],
     label: 'kiro                               -> .kiro/skills',
   },
   {
-    target: '.kilo/skills',
+    projectTarget: '.kilo/skills',
+    globalTarget: '.kilo/skills',
     aliases: ['kilo', 'kilo-code', 'kilocode'],
     label: 'kilo, kilo-code                    -> .kilo/skills',
   },
   {
-    target: '.augment/skills',
+    projectTarget: '.augment/skills',
+    globalTarget: '.augment/skills',
     aliases: ['auggie', 'augment', 'augment-code', 'augmentcode'],
     label: 'augment, auggie                    -> .augment/skills',
   },
   {
-    target: 'skills',
+    projectTarget: 'skills',
+    globalTarget: '.openclaw/skills',
     aliases: ['openclaw', 'claw'],
     label: 'openclaw                           -> skills',
+  },
+  {
+    projectTarget: '.agents/skills',
+    globalTarget: '.gemini/antigravity/skills',
+    aliases: ['antigravity', 'gemini', 'gemini-cli', 'google-antigravity'],
+    label: 'gemini, antigravity                -> .agents/skills',
   },
 ]
 
@@ -98,7 +115,7 @@ const presets = new Map()
 
 for (const group of presetGroups) {
   for (const alias of group.aliases) {
-    presets.set(alias, group.target)
+    presets.set(alias, group)
   }
 }
 
@@ -109,9 +126,10 @@ function usage() {
   console.error('  npx specworkflow install cursor')
   console.error('  npx specworkflow install copilot')
   console.error('  npx specworkflow install dsh')
+  console.error('  npx specworkflow install -g codex')
   console.error('  npx specworkflow install <project-skills-dir>')
   console.error('')
-  console.error('Presets:')
+  console.error('Project presets:')
   for (const group of presetGroups) {
     console.error(`  ${group.label}`)
   }
@@ -123,6 +141,12 @@ function looksLikePath(value) {
   return value.includes('/') || value.includes('\\') || value.startsWith('.') || value.startsWith('~')
 }
 
+function expandHome(value) {
+  if (value === '~') return homedir()
+  if (value.startsWith('~/') || value.startsWith('~\\')) return join(homedir(), value.slice(2))
+  return value
+}
+
 const [, , command, ...targetParts] = process.argv
 
 if (command === '--help' || command === '-h') {
@@ -130,22 +154,36 @@ if (command === '--help' || command === '-h') {
   process.exit(0)
 }
 
-if (command !== 'install' || targetParts.length === 0) {
+const globalMode = targetParts.includes('-g') || targetParts.includes('--global')
+const remainingTargetParts = targetParts.filter((part) => part !== '-g' && part !== '--global')
+const unknownFlag = remainingTargetParts.find((part) => part.startsWith('-') && part !== '-')
+
+if (unknownFlag !== undefined) {
+  console.error(`Unknown option: ${unknownFlag}`)
   usage()
   process.exit(1)
 }
 
-const targetArg = targetParts.length === 1 ? targetParts[0] : targetParts.join(' ')
-const normalizedTarget = targetArg.trim().toLowerCase().replace(/[\s_]+/gu, '-')
-const targetPath = presets.get(normalizedTarget) ?? targetArg
-
-if (!presets.has(normalizedTarget) && !looksLikePath(targetArg)) {
-  console.error(`Unknown agent preset: ${targetArg}`)
-  console.error('Use one of the listed presets, or pass an explicit project-level skills path such as .my-agent/skills.')
+if (command !== 'install' || remainingTargetParts.length === 0) {
+  usage()
   process.exit(1)
 }
 
-const target = resolve(process.cwd(), targetPath)
+const targetArg = remainingTargetParts.length === 1 ? remainingTargetParts[0] : remainingTargetParts.join(' ')
+const normalizedTarget = targetArg.trim().toLowerCase().replace(/[\s_]+/gu, '-')
+const preset = presets.get(normalizedTarget)
+const targetPath = preset !== undefined
+  ? globalMode ? preset.globalTarget : preset.projectTarget
+  : targetArg
+
+if (preset === undefined && !looksLikePath(targetArg)) {
+  console.error(`Unknown agent preset: ${targetArg}`)
+  console.error('Use one of the listed presets, or pass an explicit skills path such as .my-agent/skills.')
+  process.exit(1)
+}
+
+const targetBase = globalMode ? homedir() : process.cwd()
+const target = resolve(targetBase, expandHome(targetPath))
 const entries = await readdir(source, { withFileTypes: true })
 const skills = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name)
 
@@ -158,8 +196,8 @@ for (const skill of skills) {
   await cp(from, to, { recursive: true })
 }
 
-if (presets.has(normalizedTarget)) {
-  console.log(`Resolved ${targetArg} to ${targetPath}`)
+if (preset !== undefined) {
+  console.log(`Resolved ${targetArg}${globalMode ? ' globally' : ''} to ${targetPath}`)
 }
 
 console.log(`Installed ${skills.length} SpecWorkflow skills into ${target}`)
