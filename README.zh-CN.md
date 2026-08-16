@@ -87,7 +87,7 @@ npx specworkflow install .my-agent/skills
 
 ## 工作流
 
-这张图不是让每个需求都走一遍仪式，而是告诉 Agent 怎么判断路线：先看手上的请求到底需要多少结构，再把同一件事的产物放到同一个 `.spec-workflow/<feature-slug>/` 目录下。
+这一节不是让每个需求都走一遍流程，而是告诉 Agent 怎么判断路线：先看手上的请求到底需要多少结构，再把同一件事的产物放到同一个 `.spec-workflow/<feature-slug>/` 目录下。
 
 ```text
 to-grill -> to-spec -> spec-do -> do-review -> fix-review -> spec-do repair -> do-review
