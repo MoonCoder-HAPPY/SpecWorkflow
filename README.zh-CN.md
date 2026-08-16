@@ -35,7 +35,26 @@ dsh web
 npx specworkflow install codex
 ```
 
-需要时把 `codex` 换成 `claude-code`、`cursor`、`gemini`、`copilot`、`vscode`、`opencode`、`windsurf`、`cline`、`kiro`、`kilo`、`dsh`，或当前工具可识别的项目级 skills 路径。
+需要时把 `codex` 换成其它预设：
+
+| 输入 | 安装位置 |
+| --- | --- |
+| `codex`, `openai`, `agents`, `agent`, `agent-skills`, `gemini`, `gemini-cli`, `antigravity`, `google-antigravity` | `.agents/skills` |
+| `claude`, `claude-code`, `claudecode` | `.claude/skills` |
+| `cursor`, `cursor-agent`, `cursor-native` | `.cursor/skills` |
+| `copilot`, `github-copilot`, `vscode`, `vs-code` | `.github/skills` |
+| `dsh`, `deepseek`, `deepseek-harness` | `.dsh/skills` |
+| `opencode`, `open-code` | `.opencode/skills` |
+| `windsurf`, `cascade` | `.windsurf/skills` |
+| `cline` | `.cline/skills` |
+| `kiro` | `.kiro/skills` |
+| `kilo`, `kilo-code`, `kilocode` | `.kilo/skills` |
+
+未识别的纯名称会直接报错，避免因为拼错而创建错误目录。如果当前工具不在预设里，请传入明确的项目级 skills 路径：
+
+```sh
+npx specworkflow install .my-agent/skills
+```
 
 ## 快速开始
 

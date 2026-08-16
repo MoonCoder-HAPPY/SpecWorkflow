@@ -90,6 +90,12 @@ function usage() {
   for (const group of presetGroups) {
     console.error(`  ${group.label}`)
   }
+  console.error('')
+  console.error('Unknown plain names are rejected. Pass an explicit path such as .my-agent/skills for unsupported agents.')
+}
+
+function looksLikePath(value) {
+  return value.includes('/') || value.includes('\\') || value.startsWith('.') || value.startsWith('~')
 }
 
 const [, , command, ...targetParts] = process.argv
@@ -107,6 +113,13 @@ if (command !== 'install' || targetParts.length === 0) {
 const targetArg = targetParts.length === 1 ? targetParts[0] : targetParts.join(' ')
 const normalizedTarget = targetArg.trim().toLowerCase().replace(/[\s_]+/gu, '-')
 const targetPath = presets.get(normalizedTarget) ?? targetArg
+
+if (!presets.has(normalizedTarget) && !looksLikePath(targetArg)) {
+  console.error(`Unknown agent preset: ${targetArg}`)
+  console.error('Use one of the listed presets, or pass an explicit project-level skills path such as .my-agent/skills.')
+  process.exit(1)
+}
+
 const target = resolve(process.cwd(), targetPath)
 const entries = await readdir(source, { withFileTypes: true })
 const skills = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name)

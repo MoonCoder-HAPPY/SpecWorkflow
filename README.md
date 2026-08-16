@@ -35,7 +35,26 @@ dsh web
 npx specworkflow install codex
 ```
 
-Replace `codex` with `claude-code`, `cursor`, `gemini`, `copilot`, `vscode`, `opencode`, `windsurf`, `cline`, `kiro`, `kilo`, `dsh`, or a project-level skills path when needed.
+Replace `codex` with another preset when needed:
+
+| Input | Installs into |
+| --- | --- |
+| `codex`, `openai`, `agents`, `agent`, `agent-skills`, `gemini`, `gemini-cli`, `antigravity`, `google-antigravity` | `.agents/skills` |
+| `claude`, `claude-code`, `claudecode` | `.claude/skills` |
+| `cursor`, `cursor-agent`, `cursor-native` | `.cursor/skills` |
+| `copilot`, `github-copilot`, `vscode`, `vs-code` | `.github/skills` |
+| `dsh`, `deepseek`, `deepseek-harness` | `.dsh/skills` |
+| `opencode`, `open-code` | `.opencode/skills` |
+| `windsurf`, `cascade` | `.windsurf/skills` |
+| `cline` | `.cline/skills` |
+| `kiro` | `.kiro/skills` |
+| `kilo`, `kilo-code`, `kilocode` | `.kilo/skills` |
+
+Unknown plain names are rejected so a typo does not create the wrong folder. For unsupported agents, pass an explicit project-level skills path:
+
+```sh
+npx specworkflow install .my-agent/skills
+```
 
 ## Quick Start
 
