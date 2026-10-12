@@ -1,6 +1,6 @@
 {
   "name": "specworkflow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Workflow skill pack for DeepSeek Harness: requirement grilling, specs, implementation, delivery review, repair planning, bug diagnosis, and source-backed research.",
   "type": "module",
   "license": "MIT",
