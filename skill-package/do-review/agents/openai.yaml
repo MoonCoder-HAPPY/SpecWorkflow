@@ -1,4 +1,4 @@
 interface:
-  display_name: "Do Review"
-  short_description: "Review delivery readiness and repairs"
-  default_prompt: "Use $do-review to run final delivery review for the implemented spec or repair pass."
+  display_name: "交付审查 / Do Review"
+  short_description: "检查验收与交付条件 / Review acceptance and delivery readiness"
+  default_prompt: "Use $do-review to review delivery readiness. / 使用 $do-review 对当前实施结果进行交付审查。"

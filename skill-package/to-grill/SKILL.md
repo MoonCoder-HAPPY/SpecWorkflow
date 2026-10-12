@@ -20,6 +20,10 @@ Use this skill as the first stage of a spec-driven delivery workflow. The goal i
 
 This skill internalizes the behavior that would otherwise be provided by a separate grilling/interview skill. Do not invoke another skill for requirement grilling. Use the process below directly.
 
+## Language And Bilingual Handoffs
+
+Read `references/bilingual-output.md` before questions, progress, or artifact handoff. Use its language-selection and display mappings for ordinary user text; preserve technical identifiers, actual commands, evidence and file paths. English labels in these instructions name concepts rather than forcing English output. Read current Chinese/English artifact fields by the reference's domain-aware rules without changing authority, scope or prior decisions.
+
 ## Fast-Path Triage
 
 Before starting the full requirement research workflow, decide whether the request is actually simple enough to handle directly.
@@ -71,7 +75,7 @@ Record the gate result in `.spec-workflow/<feature-slug>/requirements.md`:
 - Do not create an implementation plan in this stage; only clarify requirements and recommend the next stage.
 - Do not enter spec, ticketing, or implementation while unresolved key questions remain.
 - Do not invent critical business rules, data semantics, permissions, acceptance criteria, or interaction behavior.
-- Write all user-facing questions, summaries, recommendations, artifact content, and final conclusions in the language of the latest substantive user request; keep code identifiers, paths, API names, and skill names unchanged.
+- Write user-facing questions, summaries, recommendations, artifacts and conclusions using `references/bilingual-output.md`: explicit user language first, otherwise the substantive human request/conversation language. Preserve actual technical identifiers, paths, commands and evidence.
 - If a fact can be discovered from the environment, repo, docs, logs, configs, APIs, or tools, investigate it instead of asking the user.
 - If a decision belongs to the user or product owner, ask the user and wait for the answer.
 - Ask one question at a time. Do not batch multiple questions into one large questionnaire.
@@ -80,6 +84,7 @@ Record the gate result in `.spec-workflow/<feature-slug>/requirements.md`:
 - If you recommend one option, mark it as recommended, but still show the alternatives. The user must be able to answer by selecting an option label or by writing a custom answer.
 - Continue until each key question is closed, or explicitly marked as "not solved this round", "deferred", or "user accepts risk".
 - Record every unconfirmed critical item as a pending alignment issue until it is closed, deferred, out of scope, or accepted as risk.
+- Do not offer, authorize, or activate Goal Mode during requirement research. If the user asks for autonomous execution early, record it as a pending preference, continue closing requirements, and explain that the final per-spec choice belongs at the end of `to-spec`. An early preference is not Goal Mode authorization.
 
 ## Decision Question Format
 

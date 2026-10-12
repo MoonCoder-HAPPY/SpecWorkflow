@@ -1,4 +1,5 @@
-interface:
-  display_name: "Deep Research"
-  short_description: "Research from high-trust primary sources"
-  default_prompt: "Use $deep-research to research this from primary sources."
+interface:
+
+  display_name: "深度调研 / Deep Research"
+  short_description: "依据一手来源进行调研 / Research using primary sources"
+  default_prompt: "Use $deep-research to investigate primary sources. / 使用 $deep-research 基于一手来源开展调研。"

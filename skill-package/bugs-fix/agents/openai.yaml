@@ -1,4 +1,5 @@
-interface:
-  display_name: "Bugs Fix"
-  short_description: "Diagnose hard bugs and regressions"
-  default_prompt: "Use $bugs-fix to diagnose and fix this bug or regression."
+interface:
+
+  display_name: "问题诊断 / Bugs Fix"
+  short_description: "复现、定位并修复问题 / Reproduce, diagnose and fix bugs"
+  default_prompt: "Use $bugs-fix to diagnose and fix this bug. / 使用 $bugs-fix 复现、定位并修复当前问题。"

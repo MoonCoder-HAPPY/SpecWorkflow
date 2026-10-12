@@ -9,6 +9,10 @@ A discipline for hard bugs. Skip phases only when explicitly justified.
 
 When exploring the codebase, read `CONTEXT.md` (if it exists) to get a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
+## Language And Bilingual Handoffs
+
+Read `references/bilingual-output.md` before user-facing diagnosis, questions, progress and reports, or consuming earlier workflow fields. Follow its selected language and localized human labels; keep commands, actual UI/code/API identifiers, paths, raw errors and evidence unchanged. Normalize Chinese/English authority and commit/status fields by domain without changing any diagnosis, entry, commit or production-safety gate.
+
 ## Decision Question Format
 
 Use this format for every user-owned decision in this skill, including branch choice, dirty-worktree handling, pre-fix commit, auto-commit, bisection risk, production or unknown-environment actions, temporary instrumentation, and residual risk acceptance:
@@ -103,7 +107,7 @@ Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give
 7. **Property / fuzz loop.** If the bug is "sometimes wrong output", run 1000 random inputs and look for the failure mode.
 8. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
 9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
-10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
+10. **HITL bash script.** Last resort. If a human must click, use `scripts/hitl-loop.template.sh` so the loop is structured. Adapt its instruction text to the user and actual UI, select `--lang zh-CN` or `--lang en` from the established language, and keep capture keys/actual labels unchanged. Captured output feeds back to you.
 
 Build the right feedback loop, and the bug is 90% fixed.
 

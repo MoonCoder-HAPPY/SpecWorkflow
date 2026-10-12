@@ -1,4 +1,7 @@
-interface:
-  display_name: "To Grill"
-  short_description: "Clarify requirements with focused grilling"
-  default_prompt: "Use $to-grill to clarify this requirement before writing code."
+interface:
+
+  display_name: "需求澄清 / To Grill"
+
+  short_description: "明确需求与范围 / Clarify requirements and scope"
+
+  default_prompt: "Use $to-grill to clarify this requirement. / 使用 $to-grill 澄清当前需求。"

@@ -16,15 +16,19 @@ Use this skill as stage 3 of the spec-driven delivery workflow, and also as the 
 
 This skill uses built-in implementation behavior plus internal subagent coordination when parallel work is useful and safe. A small local serial implementation is the expected fast path when child agents would add ceremony or risk. All behavior needed for implementation, clarification gates, test-first validation, integration checking, child-agent coordination, and implementation self-review is internalized here. Do not invoke separate implementation, clarification, testing, review, setup, or orchestration skills for this stage, even if the user casually names them; their semantics must be handled by this skill. This does not override platform-required skills, tool-control skills, or non-duplicative user-requested skills.
 
+## Language And Bilingual Handoffs
+
+Read `references/bilingual-output.md` before user text or artifact consumption. Render ordinary plans, questions, progress, reports and headings in its selected language. Normalize localized/legacy field labels and values within their domains before evaluating task status, authority, commit permission and Goal conditions. Canonical codes and exact technical evidence remain unchanged; translations are not new authorization, activation, ticket reopening or budget resets.
+
 ## Hard Gates
 
-- Write all user-facing plans, questions, reports, summaries, and handoff notes in the language of the latest substantive user request; keep code identifiers, paths, API names, skill names, commit refs, and command output unchanged.
+- Write plans, questions, reports, summaries and handoffs using `references/bilingual-output.md` language selection and vocabulary. Preserve code identifiers, paths, actual API/tool values, skill identifiers, commit refs and command output.
 - Treat the persisted `to-spec` spec/ticket files or `fix-review` repair-spec/repair-ticket files as authoritative unless the user explicitly designates another source.
 - Read the spec, relevant ticket files, current project guidance, and affected code before changing files.
 - Read the current spec's Goal Mode metadata before deciding whether to auto-continue after implementation. Goal Mode applies only to the current spec or current amendment that explicitly enabled it.
 - Do not expand scope beyond the approved spec or ticket. Record out-of-scope discoveries as follow-up work.
 - Do not invent missing business rules, data semantics, permission behavior, acceptance criteria, migration strategy, rollback behavior, or external service contracts.
-- If a required product or business decision is missing, use the built-in grilling gate: ask exactly one focused question using the Decision Question Format below, explain the impact, and wait for the user before implementing that branch.
+- If a required product or business decision is genuinely missing after checking the authoritative inputs, use the built-in grilling gate. During Goal Mode, first record a blocked workflow state and the exact newly discovered gap; then ask one focused decision question and wait. Do not reopen settled requirements or treat Goal Mode as a requirement-gathering stage.
 - If the spec conflicts with current code, pause the affected branch, name the conflict, and decide whether the spec needs adjustment or the code needs repair. Ask the user only when the decision is product/business-facing.
 - Do not fake implementation, mock a success path as the real path, hard-code business results, create UI-only closure for backend behavior, leave TODO pseudo-completion, silently swallow errors, or bypass real logic only to satisfy tests.
 - Before implementation, decide whether the approved work should run as local serial implementation or use internal subagents. Do not ask the user to choose an execution mode merely for process.
@@ -46,9 +50,11 @@ Use this format for every user-owned decision in this skill, including product/b
 - After the user chooses, review the chosen option before treating it as settled. Evaluate reasonableness, efficiency, safety, security, performance, maintainability, scope fit, data/permission impact, verification cost, and reversibility. Do not blindly accept or flatter the user's choice.
 - If the chosen option is unsafe, inefficient, inconsistent with repo facts, likely to cause scope creep, or weaker than an available alternative, say so plainly, explain the risk, recommend a better option, and ask one follow-up Decision Question. Only proceed after the risk is resolved, explicitly accepted, or deferred.
 - Do not ask open-ended confirmation questions such as "Do you confirm?", "Is this OK?", or "Yes/no?" when more than one reasonable path exists.
-- For dangerous or irreversible operations such as branch switching, stashing, committing, destructive verification, or external side effects, first present the options, then require exact confirmation of the chosen operation and file/scope list before executing it.
+- For dangerous or irreversible operations such as branch switching, stashing, destructive verification, or external side effects, first present the options, then require exact confirmation of the chosen operation and scope. Scoped commits already covered by the current Goal Mode choice follow the Implementation Commit Gate without a second generic confirmation.
 
 ## Inputs
+
+Read localized and legacy labels before applying the input order. For ticket eligibility, normalize the task-status field (`Status`, `ticket status`, `任务状态` or its unambiguous artifact-local `状态`) using `references/bilingual-output.md`, then apply the unchanged code-based gates below. Never treat a missing English label as a missing field or infer a ready ticket from prose in another domain.
 
 Prefer inputs in this order:
 
@@ -64,7 +70,7 @@ When a spec references tickets, read the ticket being implemented and all blocke
 
 If any selected input carries `Authority: external-tracker-only`, read executable status, blockers, dependencies, reopened decisions, override decisions, current acceptance criteria, and Goal Mode authorization from the named tracker item before creating the DAG. Treat local `.spec-workflow` spec, amendment, ticket, and Goal Mode metadata as cache metadata only; do not let stale local `Status`, `Blocked by`, dependency, acceptance, or Goal Mode fields override the tracker.
 
-Before creating the DAG, parse each local ticket's `Status`. Tickets marked `ready-for-agent` are executable. Tickets marked `in-progress` are resumable only when continuing prior work after reading `implementation-report.md`, confirming no live child agent still owns the ticket, reconciling changed files against the dirty-worktree baseline, and reporting the resumed owner. Treat any other active status as executable only with explicit user approval in the current request. Do not implement tickets marked `superseded`, `cancelled`, `deferred`, `done`, or `blocked` unless the user explicitly reopens or overrides that status in the current request. When implementing the full spec, include only executable or safely resumable tickets in the DAG and list skipped tickets with their status.
+Before creating the DAG, parse each local ticket's `Status`. Tickets marked `ready-for-agent` are executable. Tickets marked `in-progress` are resumable only after reading `implementation-report.md`, confirming no live child agent still owns the ticket, reconciling changed files against the dirty-worktree baseline, and reporting the resumed owner. During verified Goal Mode, a ticket blocked by a recorded technical/environment dependency may resume without another reopening question only when it belongs to the same authorized version, the ledger identifies the exact blocker and its closure evidence, its executable contract/ownership are unchanged, the host run is active or explicitly resumed, and budget remains. Record that evidence and change the authoritative ticket to `ready-for-agent` or `in-progress` before dispatch. This exception does not reopen a user-blocked decision, unresolved risk, or a status owned by an authoritative tracker without its permitted transition; with tracker-only authority, the tracker must first expose the executable/resumable status under already authorized tracker handling. Do not implement `superseded`, `cancelled`, `deferred`, `done`, unknown, or still-blocked tickets unless the user explicitly reopens/overrides them. Include only executable or safely resumable tickets in the DAG and list skipped tickets with their status.
 
 When continuing prior implementation work, read `.spec-workflow/<feature-slug>/implementation-report.md` when present to recover the latest coordination structure, fixed point, completed tickets, in-progress tickets, blocked tickets, changed files, validation results, child-agent ownership, and remaining risks. Present the recovered coordination state before changing files. Read relevant files under `.spec-workflow/<feature-slug>/implementation-reports/` only when historical pass context affects the current ticket, repair pass, conflict, or regression risk.
 
@@ -78,7 +84,7 @@ Also read relevant project guidance such as `AGENTS.md`, `CLAUDE.md`, `CONTEXT.m
 
 ## Goal Mode Scope
 
-Goal Mode can only be activated by metadata in the current authoritative spec source and latest applicable amendment. When `Authority: external-tracker-only` applies, the current authoritative spec source is the tracker item and local `.spec-workflow` artifacts are non-authoritative cache. Never carry Goal Mode across specs, feature directories, issues, repair plans for a different spec, or future amendments.
+Goal Mode can only be authorized by the current authoritative spec source and latest applicable amendment. Authorization is not runtime activation. Read `references/goal-mode.md` and `references/agent-runtime-adapters.md` before starting, resuming, or automatically handing off Goal Mode. For a new/unverified host, changed version/surface, missing entry, or conflicting/rejected contract, use the internal procedure in `references/runtime-discovery.md` before falling back; no external research skill is required. Verify the selected backend and current goal identity before changing code. When `Authority: external-tracker-only` applies, the tracker is authoritative and local artifacts are a cache. Never carry authorization across specs, feature directories, issues, repair plans for a different spec, or future amendments.
 
 Use these precedence rules:
 
@@ -88,17 +94,17 @@ Use these precedence rules:
 - If a later amendment exists without a fresh user-confirmed Goal Mode decision for that amendment, treat Goal Mode as disabled or paused until the user chooses again.
 - If `Authority: external-tracker-only` applies and the tracker does not expose a readable, current, user-confirmed Goal Mode authorization anchor for the current spec version, treat Goal Mode as disabled or paused until the user chooses again.
 
-When Goal Mode is enabled for the current spec:
+When Goal Mode is authorized and its selected backend is verified for the current spec (or session-only execution was explicitly selected):
 
 - Continue from this implementation pass into `do-review` when implementation and validation reach a stable reviewable state.
 - If `do-review` returns must-fix findings and the repair cycle limit has not been reached, continue into `fix-review`, then return to `spec-do` for the generated repair spec or repair tickets.
-- Stop the loop when `do-review` classifies the delivery as `complete` and Ship Decision is `can ship`, or when the explicit goal target recorded in the spec is satisfied.
+- Stop workflow execution only when the agreed target is evidenced and `do-review` classifies the delivery as `complete` with Ship Decision `can ship`. Complete the matching host goal through its actual API or post-turn evaluator mechanism in `references/goal-mode.md`; distinguish workflow acceptance from native completion still pending. A completed ticket, implementation pass, or repair plan alone is not goal completion.
 - Treat `implementation-report.md` as the canonical repair-cycle ledger for the current spec version. Initialize it from the authorized maximum repair cycles when the first Goal Mode implementation pass starts.
 - `spec-do` must not decrement repair cycles merely because a repair implementation ran. It records repair implementation status, validation results, and the current reserved cycle ID from the ledger.
 - `do-review` owns repair-cycle reservation and completion: reserve the next cycle immediately before it auto-enters `fix-review`; mark that reserved cycle completed and decrement remaining budget only after the follow-up repair `do-review` report is written.
 - Record the current cycle number, reserved cycle ID when present, completed cycles, remaining cycle budget, next automatic stage, and source authorization anchor in `implementation-report.md`.
 
-Even in Goal Mode, pause and ask the user before continuing when any required pause condition recorded in the spec occurs, including product/business ambiguity, scope expansion, unsafe git operation, unclassified dirty files, failed validation requiring risk acceptance, destructive or production-impacting verification, unrecoverable child-agent failure, or exhausted repair cycle budget.
+During Goal Mode, apply the blocker and question rules in `references/goal-mode.md`. Reuse approved product, testing, ticket, branch, and commit decisions. Resolve discoverable facts and in-scope technical choices autonomously. Failing tests with a safe in-scope fix are work to do, not a reason to ask permission; ask only when a genuine new decision or authorization is required, after recording the blocked workflow state. Preserve host-specific restrictions on pause, resume, and blocked statuses.
 
 When Goal Mode is disabled or absent, finish with the normal final implementation report and recommend the next stage instead of entering it automatically.
 
@@ -122,13 +128,13 @@ Before changing files, consume the git entry metadata from the authoritative `re
 - If prior git entry metadata exists, compare the current repo path, branch, `HEAD`, and dirty-worktree state against the recorded workflow entry decision.
 - If the user chose a specific current branch or new branch in `to-grill` or `to-spec`, stop before implementation when the current branch differs. Ask whether to switch to the recorded branch, continue on the current branch, or pause using the Decision Question Format.
 - If the recorded starting `HEAD` differs from the current `HEAD`, classify the difference as expected prior implementation work, user-approved branch movement, or unknown drift. Continue only when the current request or artifacts make the movement safe; otherwise ask one focused question.
-- If new dirty files appeared after the recorded dirty baseline, list them separately from pre-existing dirty files and ask whether to include them as intentional context, leave them unrelated and excluded, commit/stash/clean manually, or pause using the Decision Question Format.
+- If new dirty files appeared after the recorded dirty baseline, first classify them using planning artifacts, the implementation ledger, child-agent ownership, and actual diffs. Expected workflow/implementation changes are owned changes and do not need another user question. Preserve clearly unrelated changes and exclude them. Ask only when overlapping changes or ownership cannot be safely resolved, recording the blocker before asking in Goal Mode.
 - Do not switch branches, stash, reset, clean, or commit during this baseline check unless the user explicitly confirms that exact operation.
 - Record the baseline check result in `implementation-report.md`, including prior metadata source, current branch and `HEAD`, mismatch decisions, new dirty files, and whether implementation proceeded.
 
 ## Implementation Commit Gate
 
-After the coordination structure is chosen and before changing production, test, migration, config, generated, dependency, or committed workflow artifact files beyond the baseline/commit-gate records, ask whether this implementation pass may automatically create a git commit after successful completion. Use the Decision Question Format with options such as: no auto-commit; auto-commit after successful validation; pause and decide after implementation.
+After the coordination structure is chosen and before changing production, test, migration, config, generated, dependency, or committed workflow artifact files beyond baseline records, resolve commit permission. For the same authorized Goal Mode spec, consume either explicit `auto-commit: no` or `auto-commit: yes` from the final choice and do not ask again in implementation or in-scope repair passes. If this decision is unexpectedly missing, activation readiness failed: record the blocker before asking. Outside Goal Mode, ask with the Decision Question Format: no auto-commit; auto-commit after successful validation; pause and decide after implementation.
 
 This is separate from the workflow git entry gate in `to-grill` or `to-spec`:
 
@@ -140,7 +146,7 @@ Gate rules:
 - If the project is not a git repo, state that automatic commit is unavailable and continue without commit behavior.
 - Workflow artifact writes needed to record the baseline check, coordination choice, commit-gate question, and commit-gate answer may happen before this gate is answered. Do not treat those records as permission to change production, test, migration, config, generated, dependency, or unrelated workflow files.
 - If the user says no, do not commit in this pass. Record the changed files, diff status, validation results, and remaining risks in `implementation-report.md`.
-- If the user says yes, record `Auto-commit allowed: yes` in `implementation-report.md` before editing and commit only after implementation, integration, and agreed validation are complete.
+- If the user says yes, record the auto-commit permission field with canonical meaning `yes` under its selected-language human label or required machine metadata before editing. Commit only after implementation, integration and agreed validation are complete.
 - A prior project rule or user request to commit is not enough to skip this gate unless the current request explicitly grants automatic commit permission for this pass.
 - If the current spec's Goal Mode metadata explicitly grants auto-commit for this spec, treat that as the current-pass commit permission only while implementing this spec or its in-scope repair passes. Do not reuse it for another spec, another branch, unrelated dirty files, failed validation, auto-push, or destructive git operations.
 - Do not auto-push.
@@ -158,6 +164,7 @@ Use this section only when the chosen coordination structure includes internal s
 Use the current environment's subagent tools directly. The main agent remains the coordinator and must:
 
 - Define each internal subagent task with its prompt, context, allowed scope, forbidden scope, expected outputs, acceptance criteria, verification commands, dependency, and completion requirements.
+- Include the resolved per-output language policy, technical-value preservation rule, and absolute local `references/bilingual-output.md` path or its self-contained rules in initial and replacement prompts; do not assume inherited user-language context.
 - Start only tasks whose dependencies are satisfied and whose write scopes do not overlap.
 - Track every internal subagent ID, status, output, changed files, verification result, and blocker.
 - Wait for all internal subagents before final reporting.
@@ -174,8 +181,8 @@ If the DAG contains no safe or useful child-agent tasks, implement serially in t
 Apply this policy to every implementation, review, or verification child task started by this skill.
 
 - If a child agent stops because of an API call error, model service interruption, network timeout, transient tool transport failure, or context delivery interruption, do not immediately treat the task as failed.
-- First send a continuation instruction to the same child agent in the user's language, equivalent to: `Please continue from the interruption. Do not restart completed work. First summarize what is already done and what remains, then continue.`
-- Localize the continuation instruction to the latest substantive user request language. For Chinese users, send the Chinese equivalent of "please continue from the interruption; do not restart completed work; first summarize what is already done and what remains, then continue."
+- First send a continuation instruction to the same child using the already resolved conversation/progress language, equivalent to: `Please continue from the interruption. Do not restart completed work. First summarize what is already done and what remains, then continue.`
+- Preserve its assigned report/artifact language and any explicit object-specific override under `references/bilingual-output.md`. Do not re-infer language from the text of the latest user message.
 - Allow at most two recovery attempts for the same child task after transient infrastructure failures.
 - After each recovery attempt, record the attempt number, failure reason, continuation message, and resumed status in `implementation-report.md`.
 - Do not use this recovery policy for real task failures such as permission denial, missing files, invalid commands, failing tests, merge conflicts, spec ambiguity, product decisions, or evidence that the child changed files outside its allowed scope. Handle those as blockers, conflicts, or decision gates.
@@ -188,7 +195,7 @@ Use this policy when a child agent is silent, appears stuck, or has not produced
 
 - Treat `30 minutes` without meaningful output or status change as stalled unless project guidance sets a stricter limit.
 - Before stopping a stalled child, inspect any available status, terminal/output snapshot, partial files, and last reported phase.
-- Send one continuation instruction to the same child in the user's language, equivalent to: `Please continue. First summarize your current state, any completed work, any blockers, and the remaining plan.`
+- Send one continuation using the resolved language policy, equivalent to: `Please continue. First summarize your current state, any completed work, any blockers, and the remaining plan.` Preserve assigned output languages and paths.
 - If the child resumes, keep coordinating it and record the stall and recovery in `implementation-report.md`.
 - If the child remains stalled after the continuation window, stop, close, or kill only that child using the current environment's supported child-agent control. Do not kill unrelated terminals, processes, or agents.
 - Preserve and record the partial output, changed files if any, suspected ownership state, and remaining scope.
@@ -244,6 +251,7 @@ Do not assume fixed specialist child agents exist. Define each child task explic
 
 - Prompt.
 - Required context.
+- Resolved language policy per output object, exact-value preservation rule, and local language-reference path or equivalent self-contained rules.
 - Allowed files/modules.
 - Forbidden files/modules.
 - Expected artifacts or patch scope.
@@ -265,7 +273,7 @@ Prefer test-driven development at the seams agreed in `to-spec` or in the `fix-r
 Before writing any test:
 
 - Write down the public seams under test.
-- Confirm the seams with the user using the Decision Question Format when the spec does not already contain an explicit testing-seam decision.
+- Reuse the explicit testing-seam decision from the spec or applicable repair plan without re-confirming it. If missing, investigate the approved inputs first; during Goal Mode record a readiness defect and blocked workflow state before asking for a genuinely new testing decision.
 - Do not write tests at an unconfirmed seam.
 - Use `CONTEXT.md`, ADRs, and project vocabulary so test names and interfaces match the domain.
 
@@ -330,7 +338,7 @@ Use these rules:
 - If `implementation-report.md` already exists, read it first and update intentionally instead of blindly overwriting.
 - If implementing a ticket under `issues/`, update that ticket's `Status` to `in-progress`, `done`, or `blocked` as the work proceeds.
 - If implementing a repair ticket under `repair-issues/`, update that repair ticket's `Status` to `in-progress`, `done`, or `blocked` as the work proceeds.
-- When blocking a ticket, record the blocker, the required decision or dependency, and the next allowed stage.
+- When blocking a ticket, record the exact blocker, whether it is a technical/environment dependency or a user-owned decision/risk, its evidence and ownership, the required closure condition, and the next allowed stage. On safe resumption, preserve that history and record the closure evidence and status transition.
 - When completing a ticket, record the implementation-report path, validation result, commit hash when available, and remaining risk in the ticket.
 - Do not update production files only to reflect workflow status. Keep workflow state in `.spec-workflow/` or the user-designated external tracker.
 - Store implementation-stage temporary verification evidence under `verification/`, including screenshots, traces, test-results, command logs, API captures, and smoke-test evidence.
@@ -343,7 +351,7 @@ The implementation report must include:
 - Spec, ticket, repair spec, repair ticket, and amendment paths read.
 - Artifact authority marker, including external tracker reference when `Authority: external-tracker-only`.
 - Coordination structure chosen.
-- Goal Mode status for this spec, current cycle number, remaining repair cycle budget, and next automatic stage when enabled.
+- Goal Mode authorization anchor, backend, activation/verification evidence, runtime goal or run identity, execution state, current cycle number, remaining repair cycle budget, and next automatic stage. Use `references/goal-mode.md`; reports do not grant authorization.
 - Implementation fixed point and current commit or diff status.
 - Initial dirty-worktree baseline and unrelated pre-existing changes.
 - Execution DAG and actual task status.

@@ -16,17 +16,21 @@ Use this skill as stage 5 of the spec-driven delivery workflow. The goal is to c
 
 This skill internalizes the behavior needed for review repair planning, clarification, and repair ticket splitting. Do not invoke separate spec-planning, clarification, ticketing, implementation, setup, orchestration skills, external coordination runtimes, or external orchestration commands from this stage, even if the user casually names them; their semantics must be handled by this skill. Refer to `spec-do` only as the later execution stage after this planning stage completes. This does not override platform-required skills, tool-control skills, or non-duplicative user-requested skills.
 
+## Language And Bilingual Handoffs
+
+Read `references/bilingual-output.md` before questions, progress, reading findings or writing repair artifacts. Render ordinary headings, findings, blockers and delivery conclusions in its selected language. Normalize localized/legacy authority, review, task-status and Goal fields before choosing repairs or automatic handoff; keep exact finding IDs, paths, code/API values and evidence unchanged. A translated report does not reopen findings or grant scope/Goal authority.
+
 ## Hard Gates
 
 - Do not write or modify production code, tests, migrations, configs, generated-build artifacts, generated-code artifacts, dependencies, lockfiles, snapshots, or formatting-only files.
 - You may write non-production planning artifacts for this stage, such as `.spec-workflow/<feature-slug>/repair-spec.md` and `.spec-workflow/<feature-slug>/repair-issues/`, when artifact storage applies.
-- Write all user-facing questions, repair specs, tickets, summaries, recommendations, artifact content, and final reports in the language of the latest substantive user request; keep code identifiers, paths, API names, skill names, commit refs, and command output unchanged.
+- Write questions, repair specifications, task guidance, recommendations, artifacts and reports using `references/bilingual-output.md` language selection and vocabulary. Preserve actual code/API identifiers and values, skill identifiers, paths, refs and literal evidence.
 - Base the repair plan on final `do-review` findings, evidence, original requirements, specs, tickets, implementation records, and relevant code context.
 - Read Goal Mode authorization from the current spec and latest applicable amendment when present. Read `implementation-report.md` only for runtime repair-cycle ledger state, and read `review-report.md` only as evidence for findings and ship decision. Goal Mode applies only to the current spec version that explicitly enabled it.
 - Do not create commits, amend commits, create branches, switch branches, stash, reset, or clean the worktree during this planning stage. Report any needed git operation as a recommendation for the user or the next `spec-do` implementation stage.
 - Do not expand scope beyond fixing review findings and required regressions. Record unrelated discoveries as follow-up work.
 - Do not invent business expectations, interaction rules, data definitions, calculation/reporting rules, data semantics, permission boundaries, compatibility strategy, acceptance criteria, or ship decisions.
-- If a required decision is unclear, use the built-in grilling loop: ask exactly one decision question using the Decision Question Format below, include your recommended option, explain the impact, and wait before planning that branch.
+- If a required decision is genuinely missing after reading the approved inputs, use the built-in grilling loop. During Goal Mode, record the new gap as a blocked workflow state before asking one focused decision question. Reuse settled requirements, testing decisions, and risk dispositions.
 - Continue grilling until each repair-critical ambiguity is closed, deferred, out of scope, or explicitly accepted as risk.
 - If a finding lacks evidence, mark it as insufficiently evidenced and either investigate context or classify it as residual risk; do not plan speculative repairs as must-fix work.
 
@@ -60,6 +64,8 @@ When this guard applies, do not write `repair-spec.md`, `repair-specs/`, or `rep
 
 ## Inputs
 
+Read review classifications, delivery conclusions, findings and authority under both Chinese and English field aliases before triage. Normalize existing repair-task status in its task domain; do not miss a Chinese must-fix section or reset old statuses simply because its labels differ from the current output language.
+
 Gather inputs before drafting the repair spec:
 
 - Final `do-review` report and all findings.
@@ -85,7 +91,9 @@ When continuing an existing repair plan, parse existing `repair-issues/` before 
 
 ## Goal Mode Repair Handoff
 
-When Goal Mode is enabled for the current spec only:
+Read `references/goal-mode.md` and `references/agent-runtime-adapters.md` when Goal Mode is authorized. For new/unverified hosts or missing, changed, or contradictory runtime contracts, use the internal current-host research in `references/runtime-discovery.md` before proposing a fallback. Verify runtime identity and activation evidence before automatic handoff; authorization metadata alone does not activate a host goal. Use the shared blocker and question rules.
+
+When Goal Mode is authorized and the selected backend is verified for the current spec only (or session-only execution was explicitly selected):
 
 - Determine authorization only from the current authoritative `spec.md` plus the latest applicable amendment record, or the authoritative tracker spec/amendment when `Authority: external-tracker-only` applies. Use `implementation-report.md` as the canonical runtime repair-cycle ledger and `review-report.md` as evidence for must-fix findings; neither report can enable, re-enable, broaden, or extend Goal Mode by itself.
 - If repair artifacts, review report, implementation report, spec, or amendment metadata disagree, honor the current spec or latest amendment authorization, record the mismatch in `repair-spec.md`, and pause unless the safe interpretation is clearly to disable Goal Mode.
@@ -181,7 +189,7 @@ Write a repair spec that can drive the next repair implementation pass. It must 
 
 Be concrete about behavior and contracts. Include exact request/response shapes, state transitions, validation rules, permission checks, migration requirements, and error behavior when those are known and stable.
 
-If a required section is not applicable, write `Not applicable` and briefly state the evidence or reason. Do not invent API, database, permission, backend, or frontend content only to fill a template section.
+If a required section is not applicable, use the selected-language equivalent of `Not applicable` and briefly state the evidence or reason. Do not invent API, database, permission, backend, or frontend content only to fill a section.
 
 Avoid brittle implementation detail when it is likely to go stale. Include specific files or modules only when they are necessary to remove ambiguity for the repair.
 
@@ -247,7 +255,7 @@ Store repair-planning evidence, root-cause notes, reproduced command output, scr
 
 Use this repair spec and optional repair tickets as the authoritative input for the next repair implementation pass. If the user explicitly provides an issue tracker target, or the project has a documented issue tracker workflow in existing repo guidance, publish repair specs and repair tickets there as well and apply the local equivalent of `ready-for-agent` status when available. Do not depend on any external setup skill to discover or configure this; use only explicit user instructions or existing project documentation. Keep the local `.spec-workflow` repair artifact as the durable handoff unless the user explicitly says the external tracker is the only source of truth.
 
-If the user designates an external tracker as the only source of truth for the repair pass, write `Authority: external-tracker-only`, the tracker reference, and `Local Goal Mode cache: non-authoritative` into `repair-spec.md`, the append-only `repair-specs/<NN>-<pass-slug>.md`, and every affected `repair-issues/` ticket. Otherwise write `Authority: local-spec-workflow` or `Authority: local-spec-workflow-plus-tracker` as appropriate. Later `spec-do` must respect this marker and verify Goal Mode authorization from the tracker before relying on local cached repair artifacts.
+If the user designates a tracker as the only source of truth for this repair, record the authority meaning `external-tracker-only`, its tracker reference and local-cache meaning `non-authoritative` in the repair spec/pass and affected tasks. Otherwise record `local-spec-workflow` or `local-spec-workflow-plus-tracker` as appropriate. Use selected-language human labels/display values from `references/bilingual-output.md`, retaining exact required machine codes. Later `spec-do` must normalize those fields and verify authorization from the tracker before using local caches.
 
 When publishing to a real issue tracker, create one issue per repair ticket in dependency order, blockers first. Use the tracker native blocking, sub-issue, or dependency relationship where available; otherwise include a `Blocked by` section that references the blocking issue identifiers. If the source was an existing parent issue, review report, or tracker item, reference it from the generated repair spec or ticket, but do not close, retitle, relabel, or otherwise modify the parent item unless the user explicitly asks.
 
@@ -283,6 +291,8 @@ For each repair ticket, include:
 - Status: `ready-for-agent`.
 
 Before persisting repair tickets, present the proposed ticket breakdown with `Title`, `Blocked by`, and `What it repairs`. Ask one decision question using the Decision Question Format with options such as: accept as proposed; adjust blocking edges; merge or split specific tickets; pause for manual rewrite. Iterate until approved unless the user explicitly says to skip approval.
+
+During verified Goal Mode, in-scope repair-ticket splitting, dependency ordering, and reuse of approved testing seams are covered by the current execution authorization: present and persist the breakdown without another approval question. Do not let the preceding staged-workflow approval rule interrupt this automatic handoff. A change to product behavior, acceptance criteria, scope, or required testing decisions is a real blocker and follows `references/goal-mode.md` before asking.
 
 ## Final Output
 

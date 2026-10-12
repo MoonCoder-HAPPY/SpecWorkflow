@@ -1,4 +1,4 @@
 interface:
-  display_name: "Spec Do"
-  short_description: "Implement specs, repairs, and amendments"
-  default_prompt: "Use $spec-do to implement the approved spec, repair spec, or amended ticket plan."
+  display_name: "实施需求 / Spec Do"
+  short_description: "按需求规格实施与修复 / Implement specifications and repairs"
+  default_prompt: "Use $spec-do to implement the approved specification or repair plan. / 使用 $spec-do 按已批准的需求规格或修复计划实施。"

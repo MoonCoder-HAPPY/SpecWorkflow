@@ -1,4 +1,7 @@
-interface:
-  display_name: "Fix Review"
-  short_description: "Plan repairs from review findings"
-  default_prompt: "Use $fix-review to turn final review findings into a repair spec."
+interface:
+
+  display_name: "修复规划 / Fix Review"
+
+  short_description: "将审查问题转为修复计划 / Plan fixes from review findings"
+
+  default_prompt: "Use $fix-review to plan fixes from delivery review. / 使用 $fix-review 将交付审查的问题整理成修复规格。"

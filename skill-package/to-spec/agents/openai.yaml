@@ -1,4 +1,4 @@
 interface:
-  display_name: "To Spec"
-  short_description: "Create or amend implementation specs"
-  default_prompt: "Use $to-spec to create or amend an implementation-ready spec."
+  display_name: "需求规格 / To Spec"
+  short_description: "编写与修订需求规格 / Create and amend specifications"
+  default_prompt: "Use $to-spec to create or amend a specification. / 使用 $to-spec 编写或修订需求规格。"

@@ -23,11 +23,15 @@ Use the same skill to amend an existing spec when the user changes, narrows, exp
 
 This skill internalizes the behavior that would otherwise be provided by separate clarification and ticket-splitting skills. Do not invoke another skill to clarify missing spec decisions or to decide whether the work should be split. Apply the rules below directly.
 
+## Language And Bilingual Handoffs
+
+Read `references/bilingual-output.md` before questions, progress, writing artifacts, or reading earlier decisions. Use its selected language and localized human labels; keep technical IDs, paths, API contracts and machine codes unchanged. English field/status examples below are canonical meanings, not required English prose. Normalize Chinese, English and mixed historical fields in their domains before applying authority, ticket, amendment or Goal gates; never rewrite history just to translate it.
+
 ## Hard Gates
 
 - Do not write code.
 - Do not modify production files, migrations, configs, or tests as part of this stage.
-- Write all user-facing questions, summaries, recommendations, specs, ticket guidance, and persisted artifact prose in the language of the latest substantive user request; keep code identifiers, paths, API names, and skill names unchanged.
+- Write questions, summaries, specs, task guidance and artifact prose using `references/bilingual-output.md` language selection and vocabulary. Preserve actual code identifiers, paths, API contracts, skill identifiers and literal evidence.
 - Base the spec on the prior `to-grill` requirement research conclusion when it exists, preferably from `.spec-workflow/<feature-slug>/requirements.md`.
 - If no prior research conclusion exists, synthesize from the current conversation and available repo context, then check for unresolved blocking ambiguity.
 - Do not invent business rules, data semantics, permission boundaries, interaction details, acceptance criteria, migration strategy, or rollback behavior.
@@ -36,7 +40,7 @@ This skill internalizes the behavior that would otherwise be provided by separat
 - If the task is small, do not create ticket guidance just to satisfy process.
 - Persist the completed spec, and any generated tickets, using the storage rules below unless the user explicitly provides another path.
 - When amending an existing spec, do not silently expand implementation scope that is already in progress. Mark the change as a spec amendment and update the handoff artifacts before `spec-do` continues.
-- For every new spec and every recorded amendment, ask the user to choose the Goal Mode setting for this current spec version only using the Decision Question Format below. Never infer Goal Mode from prior specs, prior amendments, prior conversations, project defaults, or user preference history.
+- For every new spec and every recorded amendment, offer the per-version Goal Mode choice only after the Execution Readiness Gate below passes. It is the last planned user decision, not an early requirement question. Never infer authorization from an early preference, prior specs, prior amendments, prior conversations, project defaults, or user preference history.
 
 ## Decision Question Format
 
@@ -99,39 +103,6 @@ Record the gate result in `spec.md`; in amendment mode, also record it in the am
 - Dirty-worktree decision: committed first, continued with dirty baseline, paused, or not dirty.
 - Dirty files present before spec or amendment work began.
 - Any commit hash created by this gate, when the user explicitly approved a pre-workflow commit.
-
-## Goal Mode Gate
-
-Run this gate once for each new spec and once for every recorded amendment before writing the final canonical artifact. This includes minor textual amendments when they are persisted for traceability. A new amendment supersedes the previous Goal Mode authorization until the user explicitly chooses the mode again for the amended spec.
-
-Goal Mode is a per-spec autopilot authorization. It allows later stages to continue from this specific spec into implementation, final review, repair planning, repair implementation, and repeated final review without asking for low-value step-by-step confirmation. It never applies to another spec, another feature directory, another issue, or a future amendment unless the user explicitly chooses it again for that current spec.
-
-Ask the user to choose Goal Mode before writing the final canonical `spec.md`:
-
-- Present at least these options: Goal Mode disabled; Goal Mode enabled for this spec only with no auto-commit; Goal Mode enabled for this spec only with auto-commit after successful validation; pause and decide later.
-- If the user enables Goal Mode, ask follow-up decision questions one at a time using the Decision Question Format for the goal target, maximum automatic repair cycles, and auto-commit authorization. Default recommendation for the target: `Implement the current spec, pass agreed validation, complete final review with no must-fix findings, and reach Ship Decision: can ship`. Default recommendation for maximum automatic repair cycles: `2`.
-- If the user disables Goal Mode, record `Goal mode: disabled` in `spec.md` and proceed with the normal staged workflow.
-- If the user enables Goal Mode, record `Goal mode: enabled for this spec only` in `spec.md`.
-- Record every answer in `spec.md`; in amendment mode, also record the refreshed Goal Mode decision in the amendment record.
-- Record a stable authorization anchor: spec ID, amendment ID when applicable, artifact root, authority marker, decision source (`user-confirmed-in-current-conversation`), decision timestamp or current date, supersedes prior Goal Mode authorization, and superseded-by marker when a later amendment exists.
-- Treat the Goal Mode section in the current canonical `spec.md` plus the latest applicable amendment record as the only authorization source. Later implementation, review, and repair reports may record runtime state, but they must not enable, re-enable, broaden, or extend Goal Mode.
-- If an external tracker is the only authoritative source, mirror the Goal Mode authorization anchor and every Goal Mode answer into the tracker item. Mark the local `.spec-workflow` spec or amendment as `Authority: external-tracker-only` and `Local Goal Mode cache: non-authoritative`. Later stages may use the local cache only after verifying it matches the tracker. If the tracker has no readable, current, user-confirmed Goal Mode authorization for the current spec version, Goal Mode is disabled or paused until the user chooses again.
-
-Do not enable Goal Mode when any essential product, business, data, permission, migration, rollout, or acceptance decision remains open. Close, defer, or explicitly accept those risks before offering Goal Mode.
-
-Goal Mode must pause and ask the user when any of these occurs later:
-
-- A required product, business, data, permission, migration, rollout, or acceptance decision is missing.
-- The implementation would expand beyond the current spec, current amendment, or current repair spec.
-- Git branch switching, stashing, resetting, cleaning, rebasing, pushing, or destructive history movement is needed.
-- New dirty files appear that are not part of the recorded baseline and cannot be safely classified.
-- Validation fails and continuing would require accepting risk or changing expectations.
-- A review finding requires changed scope rather than an in-scope repair.
-- A child agent is unrecoverable and the remaining work cannot be safely serialized or replaced.
-- The environment is production or unknown and the needed verification would be destructive or externally visible.
-- The maximum automatic repair cycle count is reached.
-
-When Goal Mode is enabled and the final spec plus any ticket guidance are persisted with no pause condition active, continue directly into `spec-do` for this same spec version instead of ending with only a recommendation. When Goal Mode is disabled or absent, end normally and recommend `spec-do` as the next stage.
 
 ## Context Gathering
 
@@ -205,10 +176,10 @@ Use these rules:
 - When a ticket remains valid but needs changed scope, update the existing ticket file in place and mention the amendment ID in the ticket.
 - When a new ticket is needed, create the next numbered file under `issues/`.
 - When a ticket is no longer valid, keep the file but change its status to `superseded`, `cancelled`, or `deferred`, and reference the amendment ID and replacement ticket when one exists.
-- When ticket order changes, preserve existing ticket file names when possible and update `Dependencies`, `Blocked by`, `Status`, and `Input context for spec-do` sections instead of renumbering every file.
+- When ticket order changes, preserve existing filenames and update the dependency, blocker, task-status and spec-do input-context fields using their bilingual aliases instead of renumbering every file.
 - If renumbering is unavoidable, explain why in the amendment record and final response.
 - If an external issue tracker is authoritative, mirror the same amendment summary, ticket status changes, and dependency changes there using explicit user instructions or documented project workflow.
-- If the user designates an external tracker as the only source of truth, write `Authority: external-tracker-only` and the tracker reference into `spec.md`, affected tickets, and amendment records. Otherwise write `Authority: local-spec-workflow` or `Authority: local-spec-workflow-plus-tracker` as appropriate.
+- If the user designates a tracker as the only source of truth, record the authority field with canonical meaning `external-tracker-only` plus the tracker reference in `spec.md`, affected tickets and amendments. Otherwise record `local-spec-workflow` or `local-spec-workflow-plus-tracker` as appropriate. Localize human labels/display values with `references/bilingual-output.md`; retain exact codes in any required machine metadata or real tracker payload.
 
 Each amendment record must include:
 
@@ -256,7 +227,7 @@ Continue until each essential decision is closed, deferred, out of scope, or acc
 
 Write the spec so a later `spec-do` stage can implement it without guessing. Include every section below, using the user's language for section titles and content:
 
-- Goal Mode metadata: enabled or disabled for this spec version only; spec ID; amendment ID when applicable; artifact root; authority marker; decision source and date; supersedes or superseded-by markers; goal target when enabled; maximum automatic repair cycles; auto-commit authorization for this spec; required pause conditions; and a note that runtime cycle counts are maintained by `implementation-report.md`, not by the authorization metadata.
+- Goal Mode authorization metadata: pending selection until execution readiness, then enabled or disabled for this spec version only; spec ID; amendment ID when applicable; artifact root; authority marker; decision source and date; supersedes or superseded-by markers; agreed target, repair limit, backend, commit policy, and pause conditions. Record activation evidence and cycle counts in `implementation-report.md`, never infer running status from authorization alone. Use the contract in `references/goal-mode.md` when preparing this section.
 - Problem statement from the user's perspective.
 - Solution from the user's perspective.
 - Background and goal.
@@ -281,7 +252,7 @@ Write the spec so a later `spec-do` stage can implement it without guessing. Inc
 
 Be concrete about behavior and contracts. Include exact request/response shapes, state transitions, validation rules, permission checks, migration requirements, and error behavior when those are known and stable.
 
-If a required section is not applicable, write `Not applicable` and briefly state the evidence or reason. Do not invent API, database, permission, backend, or frontend content only to fill a template section.
+If a required section is not applicable, use the selected-language equivalent of `Not applicable` and briefly state the evidence or reason. Do not invent API, database, permission, backend, or frontend content only to fill a section.
 
 Avoid brittle implementation detail when it is likely to go stale, such as speculative file paths or line numbers. Include specific files or modules only when they are necessary to remove ambiguity for implementation.
 
@@ -298,7 +269,7 @@ Define testing at public seams:
 - Include frontend real-interaction verification when the feature has UI behavior.
 - Include backend API/service/repository/migration verification when backend behavior changes.
 
-Before finalizing, present the proposed testing seams and ask the user to choose: accept the proposed seams, adjust one or more seams, defer the seam decision as accepted risk, or pause. If the testing seam itself is a product or architecture decision and is not obvious from repo patterns, ask one clarification question using the Decision Question Format before finalizing the spec.
+Before the Goal Mode choice, present the proposed testing seams and resolve the testing decision: accept the proposed seams, adjust one or more seams, defer the seam decision as accepted risk, or pause. Reuse an explicit decision already made for this version rather than asking again. If deferring leaves an acceptance-critical path unverifiable, the Execution Readiness Gate does not pass. If the testing seam itself is a product or architecture decision and is not obvious from repo patterns, clarify it before finalizing the spec.
 
 ## Artifact Storage
 
@@ -369,14 +340,49 @@ For each ticket, include:
 - Acceptance criteria.
 - Dependencies.
 - Blocked by.
-- Status: `ready-for-agent`.
+- Task status: canonical meaning `ready-for-agent`, rendered with the selected-language label/value for human records; preserve required machine codes.
 - Priority.
 - Whether it blocks delivery.
 - Whether it can run in parallel.
 - Parallel execution boundary.
 - Input context for `spec-do`: spec path, this ticket path, blockers, relevant modules or docs, and verification seams or commands.
 
-Before persisting tickets, present a numbered ticket breakdown with `Title`, `Blocked by`, and `What it delivers`. Ask one decision question using the Decision Question Format with options such as: accept as proposed; adjust blocking edges; merge or split specific tickets; pause for manual rewrite. Iterate until the user approves the breakdown, unless the user explicitly instructs you to skip approval. Then persist each ticket using the artifact storage rules above. The goal is to produce executable, durable guidance for the next stage.
+Before persisting tickets, present a numbered breakdown with title, blockers and delivered outcome using the selected-language labels. Ask one decision question with options such as: accept as proposed; adjust blockers; merge or split specific tickets; pause for manual rewrite. Iterate until approved unless the user explicitly skips approval, then persist the tickets. Language changes do not change the approval gate.
+
+## Execution Readiness Gate
+
+Run this after context gathering, clarification, testing decisions, applicable amendment approval and optional ticket approval/persistence. Persist and present the finished `spec.md` with the localized Goal-authorization field meaning `pending selection` before offering execution mode.
+
+Verify all of these before the final choice:
+
+- In-scope business, data, permission, interaction, migration, rollout, rollback, and acceptance decisions are closed. Deferred work is explicitly excluded; an accepted risk must not stand in for a decision needed to implement the approved behavior.
+- The spec, applicable amendments, and any tickets agree, are readable, and have an executable frontier. With tracker-only authority, verify the finished authoritative tracker version and matching local cache.
+- Testing seams, required checks, environment, and available verification tools are settled. No acceptance-critical verification is postponed without an approved executable alternative.
+- The selected runtime's prerequisite permissions, native setup/plan forms, execution location, and automatic commit behavior are understood. Do not offer a mode/commit policy the host cannot honor. A required setting change, new task/location, or increased access is a separate disclosed decision; Goal selection alone does not authorize it.
+- The branch and dirty baseline are settled. Classify workflow artifacts created during planning as owned workflow changes, not unknown dirty files.
+- Read `references/goal-mode.md` and the relevant host guidance in `references/agent-runtime-adapters.md`. Discover actual host capabilities without starting a goal. For an unknown host, unverified capability, version/surface mismatch, missing entry, conflicting evidence, or rejected activation contract, run the built-in current-host research procedure in `references/runtime-discovery.md` before choosing a fallback. Identify the usable backend, activation evidence, and any required user host action.
+- Present the exact spec/version and artifact paths, completion target, Goal round limit (default recommendation: `3` automatic repair cycles), commit policy, and backend limits. Before the final execution choice, present the round-limit options from `references/goal-mode.md`: `3 rounds` (default, recommended), `5 rounds`, `10 rounds`, and `Custom`. Reuse an explicit limit already supplied for this version; do not ask again. Resolve custom values before the final choice, one decision at a time. Do not invent time/token budgets.
+
+If readiness fails, remain in planning and resolve the actual gap. Do not offer Goal Mode as a way to finish requirement gathering. An early request such as "run this autonomously" is a pending preference, not the final authorization.
+
+## Final Goal Mode Choice And Activation
+
+This is the last planned user decision for every new spec and every recorded amendment, including textual amendments recorded for traceability. An amendment invalidates prior authorization; stop automatic work on the old inputs before changing them, honoring the host's pause/stop restrictions in `references/goal-mode.md`. Never carry authorization into another version.
+
+After readiness passes, use the Decision Question Format to offer:
+
+- Staged execution: Goal Mode disabled; save the spec and wait for explicit implementation authorization.
+- Run this finished spec continuously, without auto-commit: use the disclosed backend, target, and repair limit.
+- Run this finished spec continuously, with scoped auto-commit after agreed validation: same backend, target, and repair limit; omit this option if Git is unavailable.
+- Pause or revise: do not activate execution; return to planning if the user wants changes.
+
+Use an accurate backend label. When no persistent goal/loop is available, label the continuous options `session-only execution` and disclose that the host may end the turn and require a user continuation. Do not sell that as native Goal Mode. A backend that needs a user command remains `awaiting-host-activation` until verified.
+
+The user's continuous option approves the presented ready spec and its stated execution parameters together. Do not ask target, repair-limit, commit-policy, ticket, or testing questions after that choice unless the user introduces a change or a new blocker is discovered. If the user selects a custom alternative or changes scope, return to readiness and present a fresh final choice.
+
+Persist the choice and authorization anchor in `spec.md` and the current amendment when applicable, following `references/goal-mode.md`. Mirror it to the tracker when the tracker is authoritative and the write is authorized. Then perform the real activation procedure from that reference, record the result in `implementation-report.md`, and enter `spec-do` only after the selected backend is verified (or session-only execution was explicitly selected). A sentence announcing Goal Mode and a Markdown flag are not activation.
+
+When the user selects staged execution or pause, do not start any goal or implementation. When activation requires a user host action, provide the exact action once and wait for activation evidence, without reopening requirements. When activation fails, record the failure; do not silently downgrade to session-only execution.
 
 ## Final Output
 
@@ -392,6 +398,6 @@ End with:
 - Recommended implementation order.
 - The current frontier: tickets with no blockers that can start immediately; later work should proceed from the blocker-free frontier.
 - Open questions, only if they are explicitly deferred, out of scope, or accepted as risk.
-- A clear recommendation on whether the next stage should be `spec-do`; when Goal Mode is enabled for this spec and no pause condition is active, state that the agent is entering `spec-do` automatically for this spec.
+- Exact execution state: staged, authorized but awaiting host activation, verified active backend, explicitly selected session-only execution, or blocked. Report activation evidence when active and actually continue into `spec-do`; do not end with only a promise to start.
 
 When the full spec-driven delivery workflow is in use, the next stage must read the persisted spec, any ticket files, and any amendment records that affect the chosen spec or ticket as its authoritative input.

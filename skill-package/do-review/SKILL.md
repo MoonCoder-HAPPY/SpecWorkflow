@@ -17,9 +17,13 @@ Use this skill as stage 4 of the spec-driven delivery workflow. The goal is to d
 
 This skill uses built-in review behavior plus internal subagent coordination when independent review axes benefit from isolation. Small or tightly scoped reviews may run locally with explicit axis separation. All review, clarification, and repair handoff behavior needed by this stage is internalized here. Do not invoke separate review, clarification, spec-planning, setup, orchestration skills, external coordination runtimes, or external orchestration commands, even if the user casually names them; their semantics must be handled by this skill. This does not override platform-required skills, tool-control skills, or non-duplicative user-requested skills.
 
+## Language And Bilingual Handoffs
+
+Read `references/bilingual-output.md` before user text and review inputs. Use localized human headings, review-axis names, classifications and delivery conclusions. Before Goal/cycle/ship decisions, normalize the current artifact's completion-status, ship-decision, authority and runtime fields within their domains; English labels and code examples below describe canonical meanings rather than mandatory visible English. Mixed or old reports remain readable, conflicting current values remain blockers, and actual API states/identifiers stay unchanged.
+
 ## Hard Gates
 
-- Write all user-facing review plans, questions, findings, reports, and ship decisions in the language of the latest substantive user request; keep code identifiers, paths, API names, skill names, commit refs, and command output unchanged.
+- Write review plans, questions, findings, reports and delivery conclusions using `references/bilingual-output.md` language selection and vocabulary. Preserve actual code/API identifiers and values, skill identifiers, paths, refs, commands and literal evidence.
 - Do not add features, change scope, or fix code in this stage.
 - Do not modify production code, tests, migrations, configs, generated artifacts, dependency files, lockfiles, snapshots, or formatting-only files during final review.
 - You may write non-production review artifacts such as `.spec-workflow/<feature-slug>/review-report.md` when durable handoff is needed. In Goal Mode, you may also update only the Goal Mode runtime ledger fields in `.spec-workflow/<feature-slug>/implementation-report.md`, such as reserved cycle, completed cycles, remaining budget, next automatic stage, and pause reason.
@@ -27,7 +31,7 @@ This skill uses built-in review behavior plus internal subagent coordination whe
 - Read Goal Mode authorization from the current spec and latest applicable amendment when present. Read `implementation-report.md` only for runtime ledger state such as cycle counts, validation status, child-agent state, and next automatic stage. Goal Mode applies only to the current spec version that explicitly enabled it.
 - Consume git entry decisions, dirty-worktree baselines, implementation fixed points, commit hashes, and auto-commit decisions from workflow artifacts when present. Use them to define the review diff and to separate implementation changes from pre-existing user work.
 - Respect `Authority: external-tracker-only` markers in local artifacts. When present, read the named tracker item as the authoritative spec/review source and Goal Mode authorization source before relying on local `.spec-workflow` files.
-- If a business expectation, interaction rule, or acceptance criterion is unclear, use the built-in grilling gate: ask exactly one focused decision question using the Decision Question Format below and wait. Do not reinterpret the requirement silently.
+- If a business expectation, interaction rule, or acceptance criterion is genuinely missing after reading the authoritative decisions, use the built-in grilling gate. During Goal Mode, first record the new gap as a blocked workflow state, then ask one focused decision question and wait. Do not reopen settled expectations or reinterpret them silently.
 - If a fix is needed, record the finding and recommend the next stage, `fix-review`, to produce a repair spec. Outside Goal Mode, concrete low-risk evidence-backed findings that need only an obvious direct edit and do not change product behavior, API/data contracts, permissions, acceptance criteria, testing seams, or cross-module design may be routed to direct implementation instead of forcing `fix-review`. In Goal Mode, must-fix findings must not bypass `fix-review` unless the user explicitly interrupts the automatic loop and authorizes direct repair. Do not call another spec-planning skill from here.
 - Do not accept fake responses, mocked success flows, hard-coded business results, UI-only closure for backend behavior, TODO pseudo-completion, silent errors, or tests that bypass real business logic.
 - Do not create commits, amend commits, create branches, switch branches, stash, reset, or clean the worktree during this review stage. Report any needed git operation as a recommendation for the user or the next implementation stage.
@@ -71,7 +75,11 @@ When `.spec-workflow/<feature-slug>/amendments/` exists, scan every amendment re
 
 ## Goal Mode Review Handoff
 
-When Goal Mode is enabled for the current spec only:
+Read completion and delivery fields under either English or Chinese aliases, normalize to the canonical codes below, and only then evaluate the state transitions. A Chinese delivery conclusion is not a missing `Ship Decision`; it is also not permission to skip validation or to mark a live host goal complete.
+
+Read `references/goal-mode.md` and `references/agent-runtime-adapters.md` when Goal Mode is authorized. For new/unverified hosts or missing, changed, or contradictory runtime contracts, use the internal current-host research in `references/runtime-discovery.md` before proposing a fallback. Verify runtime identity and activation evidence; metadata alone does not start a host goal. Apply the shared blocker, question, and lifecycle rules before any automatic handoff.
+
+When Goal Mode is authorized and the selected backend is verified for the current spec only (or session-only execution was explicitly selected):
 
 - Determine authorization only from the current authoritative `spec.md` plus the latest applicable amendment record, or the authoritative tracker spec/amendment when `Authority: external-tracker-only` applies. Use `implementation-report.md` only as the runtime ledger for current cycle number, reserved next cycle, remaining budget, validation state, child-agent state, and next automatic stage.
 - If review-report, implementation-report, spec, amendment, or tracker metadata disagree, honor the current authoritative spec source and latest amendment authorization, record the mismatch in `review-report.md`, and pause unless the safe interpretation is clearly to disable Goal Mode.
@@ -81,9 +89,10 @@ When Goal Mode is enabled for the current spec only:
   1. Detect pause conditions first. If the review is blocked, unstable, has unresolved child-agent ownership, has blocked validation, has unclear diff boundary, or any finding requires product/business decisions, scope expansion beyond the current spec, destructive verification, unsafe git operations, or risk acceptance, pause and do not mark any reserved repair cycle completed or decrement budget.
   2. If this is the follow-up review after a reserved repair cycle and no pause condition is active, write the review report, then update `implementation-report.md` by marking that exact reserved cycle ID completed, decrementing remaining repair cycles exactly once, recording the review report path, and clearing the reservation. Never reserve a new cycle before this completion/decrement step.
   3. After any required completion/decrement step, evaluate the review outcome using the updated remaining budget.
-  4. If review classification is `complete` and Ship Decision is `can ship`, stop the automatic loop and report that the current spec goal is satisfied.
+  4. If review classification is `complete`, Ship Decision is `can ship`, and the agreed goal target is evidenced, persist completion evidence and finish workflow execution using the host-specific completion mechanism in `references/goal-mode.md`. Before a completion/proposal tool that can terminate the turn, first surface required visible evidence and save pending runtime state; call it last and honor its termination contract. Otherwise update only the matching goal and verify when allowed. With post-turn evaluation, present evidence before any terminating tool or in a permitted final response, then end the turn; do not wait for a nonexistent API or a verdict that can only arrive afterward. Do not mark unrelated goals complete or claim native completion before it is observable.
   5. If must-fix issues remain and the updated ledger shows remaining repair cycle budget for the current authorization anchor, reserve the next repair cycle in `implementation-report.md`, write or update the review report with that reservation, then continue to `fix-review` automatically.
-  6. If must-fix issues remain but the updated repair cycle budget is exhausted, pause and ask the user using the Decision Question Format whether to extend Goal Mode for this same spec, accept the remaining risk, or stop.
+  6. If must-fix issues remain but the updated repair cycle budget is exhausted, record the blocked workflow state and ask whether to extend the run for this same spec, accept the remaining risk, or stop. Record any extension through `to-spec` in the current authoritative spec/authorization before resuming; a review report cannot grant more budget.
+  7. Every other outcome must name the exact unmet goal condition and a next action. If only already accepted/deferred non-blocking items remain and all agreed conditions are evidenced, normalize the classification to `complete` and apply step 4. If approved implementation/validation work remains, return to `spec-do` without reserving a review-repair cycle. If its resolution needs a new decision or unavailable required evidence, record a blocked workflow state before asking. Never leave an active run with no next action or repeatedly review an unchanged state.
 
 When Goal Mode is disabled or absent, recommend `fix-review` or direct implementation as appropriate, but do not enter the next stage automatically.
 
@@ -92,7 +101,7 @@ When Goal Mode is disabled or absent, recommend `fix-review` or direct implement
 Before starting final review tasks, confirm the implementation state is stable enough to review:
 
 - If `implementation-report.md` or ticket files show live child-agent ownership, in-progress implementation tasks, unresolved merge/integration work, unrecovered partial child output, missing final aggregation, or blocked validation required by the spec, do not perform a normal final review.
-- Ask the user using the Decision Question Format whether to pause for `spec-do` to finish, run a clearly labeled partial review, or classify the delivery as `incomplete` based on the unfinished implementation state.
+- During Goal Mode, autonomously wait for known live children or return to the existing in-scope `spec-do` pass to finish safe implementation/validation work. Do not reserve a repair cycle merely for unfinished implementation. If ownership, required validation, or the diff cannot be safely recovered, record the blocked workflow state before asking. Outside Goal Mode, ask whether to wait for implementation, run a labeled partial review, or classify as `incomplete`.
 - A partial review must label its scope, exclude unmerged child work unless explicitly included as evidence, and must not produce `can ship`.
 - If reviewing a committed implementation, resolve the fixed point and review target commit before starting review. If reviewing uncommitted implementation, compare against the recorded dirty-worktree baseline and identify which dirty files belong to the implementation pass.
 - If the fixed point, target diff, or ownership state cannot be established, ask one focused clarification question before dispatching review child agents or writing review artifacts.
@@ -109,6 +118,7 @@ Use internal review child agents when the review is broad, cross-module, high-ri
 The main agent must remain the reviewer of record:
 
 - Define each child review task with prompt, input context, allowed read scope, forbidden write scope, expected evidence, pass criteria, and completion report.
+- Include the resolved per-output language policy, technical-value preservation rule, and absolute local `references/bilingual-output.md` path or its self-contained rules in initial and replacement prompts; do not assume inherited human-language context.
 - Prohibit child agents from modifying production code, committed test directories, migration directories, config directories, generated-build/generated-code directories, dependency directories, lockfile locations, snapshots, formatting-only files, or any production artifact.
 - Track every child-agent ID, status, output, evidence, blocker, and recovery attempt in the review report when artifacts are written.
 - Aggregate results after every review task completes. Do not only forward child-agent findings.
@@ -119,8 +129,8 @@ The main agent must remain the reviewer of record:
 Apply this policy to every review child task started by this skill.
 
 - If a review child agent stops because of an API call error, model service interruption, network timeout, transient tool transport failure, or context delivery interruption, do not immediately treat the review task as failed.
-- First send a continuation instruction to the same child agent in the user's language, equivalent to: `Please continue from the interruption. Do not restart completed work. First summarize what is already done and what remains, then continue.`
-- Localize the continuation instruction to the latest substantive user request language. For Chinese users, send the Chinese equivalent of "please continue from the interruption; do not restart completed work; first summarize what is already done and what remains, then continue."
+- First send a continuation instruction to the same child using the already resolved conversation/progress language, equivalent to: `Please continue from the interruption. Do not restart completed work. First summarize what is already done and what remains, then continue.`
+- Preserve its assigned report/artifact language and any explicit object-specific override under `references/bilingual-output.md`. Do not re-infer language from the latest user's message text.
 - Allow at most two recovery attempts for the same review task after transient infrastructure failures.
 - Record each recovery attempt, failure reason, continuation message, and resumed status in the review report when review artifacts are written.
 - Do not use this recovery policy for real review findings or real task failures such as permission denial, missing files, invalid commands, failed verification, unavailable test environment, spec ambiguity, destructive-action safety blocks, or evidence that a child attempted writes outside its read-only review scope. Handle those as findings, blockers, or decision gates.
@@ -133,7 +143,7 @@ Use this policy when a review child agent is silent, appears stuck, or has not p
 
 - Treat `30 minutes` without meaningful output or status change as stalled unless project guidance sets a stricter limit.
 - Before stopping a stalled child, inspect any available status, output snapshot, partial findings, and last reported review axis.
-- Send one continuation instruction to the same child in the user's language, equivalent to: `Please continue. First summarize your current state, any completed review work, any blockers, and the remaining plan.`
+- Send one continuation using the resolved language policy, equivalent to: `Please continue. First summarize your current state, any completed review work, any blockers, and the remaining plan.` Preserve assigned output languages and paths.
 - If the child resumes, keep coordinating it and record the stall and recovery in the review report when artifacts are written.
 - If the child remains stalled after the continuation window, stop, close, or kill only that child using the current environment's supported child-agent control. Do not kill unrelated terminals, processes, or agents.
 - Preserve and record the partial output, evidence gathered, review axis, and remaining scope.
@@ -330,17 +340,18 @@ If child results conflict:
 
 Classify delivery completion:
 
-- `complete`: all acceptance-critical paths pass and no must-fix finding remains.
-- `mostly complete`: core paths pass but non-blocking issues or moderate risks remain.
+- `complete`: all agreed goal conditions and acceptance-critical paths pass and no must-fix finding remains. Already accepted or deferred non-blocking items do not downgrade this classification.
+- `mostly complete`: core paths pass, but an explicitly named agreed deliverable or risk disposition still needs work. Name it and the next action; do not use this label solely because accepted non-blocking follow-ups remain.
 - `incomplete`: acceptance-critical behavior is missing, broken, unverifiable, or unsafe.
 - If no reviewable requirement source exists, classify as `incomplete`.
 
-Ship Decision:
+Ship decision (render the label and values with `references/bilingual-output.md`; the following values are canonical internal meanings):
 
 - `can ship`: no must-fix findings and residual risk is acceptable.
 - `fix before ship`: one or more must-fix findings exist.
 - `do not ship`: critical requirement, data, security, or operational risk makes delivery unsafe.
 - Do not choose `can ship` when no reviewable requirement source exists, when real frontend interaction was required but not performed, or when backend restart/service availability was required but unverified.
+- During Goal Mode, `can ship` cannot hide a still-unmet agreed goal condition. Resolve classification using the Goal Mode Review Handoff rules before completing the matching host goal.
 
 ## Final Output
 
