@@ -69,15 +69,19 @@ Goal target: implement this version, pass agreed validation, complete final
   review with no must-fix findings, and reach Ship Decision: can ship
 Maximum automatic repair cycles: <user-selected Goal round limit; default recommendation 3>
 Auto-commit: no | yes, scoped changes after successful agreed validation
+Implementation subagents: local | auto | prefer
+Review subagents: local | auto | prefer
 Required validation / environment: <approved checks and safe environment>
 Pause conditions: <new decision, changed scope, permission/ownership blocker,
   unavailable required verification, or exhausted authorized limits>
 ```
 
-The final menu must display the actual target, limit, backend, and commit
-policy. A recommendation becomes an agreed parameter only when the user
-selects an option containing it; do not invent budgets. No-commit is as settled
-a decision as auto-commit. Every new spec/version needs a fresh final choice.
+The final menu must display the actual target, limit, backend, commit policy,
+and the separately selected implementation/review subagent policies. A
+recommendation becomes an agreed parameter only when the user selects an option
+containing it; do not invent budgets or subagent defaults. No-commit and
+`local` subagent policies are as settled as auto-commit or `auto`. Every new
+spec/version needs fresh choices.
 The anchor must distinguish renewed decisions for the same version; use an
 available user-message reference or a recorded authorization generation rather
 than relying on the calendar date alone.
@@ -133,7 +137,8 @@ budgets are separate settings; never map this number to them automatically.
 5. For `native-goal` or `host-loop`, use the exposed supported API/entry point
    with the approved objective and limits, then read back state. The objective
    must identify the absolute spec path or authoritative tracker, spec version,
-   authorization anchor, artifact root, target, repair limit, and commit policy.
+   authorization anchor, artifact root, target, repair limit, commit policy,
+   and subagent policies.
    Store the anchor in host metadata when supported; otherwise include it in
    the objective text so read-back/resume can bind the run unambiguously. Keep
    longer detail in the spec rather than exceeding the host's objective limit.
@@ -162,7 +167,8 @@ Use `.spec-workflow/<feature-slug>/implementation-report.md` for latest runtime
 state and `implementation-reports/` for pass history. Include:
 
 - Authorization anchor, authoritative input paths/version, backend, host
-  session/run identity, activation evidence, and last state verification.
+  session/run identity, activation evidence, subagent policies, and last state
+  verification.
 - Executable-input fingerprint: file hashes or authoritative tracker revision
   for the spec, relevant amendments, and ticket contracts at activation.
   Exclude runtime status/report updates from this comparison; a changed
@@ -193,9 +199,11 @@ step-by-step confirmation gates in the executing/review/repair skills:
 - Reuse settled business rules, acceptance criteria, testing seams, ticket
   boundaries, branch decision, dirty baseline, and both commit choices. Do not
   ask the same question again merely because the stage changed.
-- Choose in-scope technical details, serial/subagent coordination, repair
-  ticket granularity, and ordering using the approved contracts and repo
-  conventions. Present decisions as progress; do not require new approval.
+- Choose in-scope technical details, repair ticket granularity, and ordering
+  using the approved contracts and repo conventions. Apply the user's selected
+  implementation/review subagent policy; do not replace `local` with automatic
+  delegation or re-ask a settled policy. Present in-policy decisions as
+  progress.
 - Classify new dirty files against the ledger and actual diffs. Owned planning,
   implementation, child, and repair changes are expected. Preserve unrelated
   files. Only unresolved overlap/ownership requires a decision.

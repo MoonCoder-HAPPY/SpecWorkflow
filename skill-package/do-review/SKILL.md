@@ -15,7 +15,7 @@ description: >-
 
 Use this skill as stage 4 of the spec-driven delivery workflow. The goal is to decide whether the implemented requirement is actually complete and safe to ship. This stage reviews; it does not implement fixes or expand the feature.
 
-This skill uses built-in review behavior plus internal subagent coordination when independent review axes benefit from isolation. Small or tightly scoped reviews may run locally with explicit axis separation. All review, clarification, and repair handoff behavior needed by this stage is internalized here. Do not invoke separate review, clarification, spec-planning, setup, orchestration skills, external coordination runtimes, or external orchestration commands, even if the user casually names them; their semantics must be handled by this skill. This does not override platform-required skills, tool-control skills, or non-duplicative user-requested skills.
+This skill uses built-in review behavior plus user-selected internal subagent coordination. Before review, resolve the user's review policy (`local`, `auto`, or `prefer`) from the authoritative spec/amendment, tracker, review/implementation artifacts, or current conversation using Review Subagent Preference. Do not assume a subagent default; in Goal Mode a missing policy pauses for the required choice, while outside Goal Mode ask only when the conditional policy-resolution rules establish that independent child reviewers could materially improve confidence. All review, clarification, and repair handoff behavior needed by this stage is internalized here. Do not invoke separate review, clarification, spec-planning, setup, orchestration skills, external coordination runtimes, or external orchestration commands, even if the user casually names them; their semantics must be handled by this skill. This does not override platform-required skills, tool-control skills, or non-duplicative user-requested skills.
 
 ## Language And Bilingual Handoffs
 
@@ -29,6 +29,7 @@ Read `references/bilingual-output.md` before user text and review inputs. Use lo
 - You may write non-production review artifacts such as `.spec-workflow/<feature-slug>/review-report.md` when durable handoff is needed. In Goal Mode, you may also update only the Goal Mode runtime ledger fields in `.spec-workflow/<feature-slug>/implementation-report.md`, such as reserved cycle, completed cycles, remaining budget, next automatic stage, and pause reason.
 - Treat original requirements, `to-grill` conclusions, `to-spec` specs/tickets/amendments, `fix-review` repair specs/tickets, `spec-do` implementation reports, and relevant code as review inputs.
 - Read Goal Mode authorization from the current spec and latest applicable amendment when present. Read `implementation-report.md` only for runtime ledger state such as cycle counts, validation status, child-agent state, and next automatic stage. Goal Mode applies only to the current spec version that explicitly enabled it.
+- Resolve the review subagent policy before starting review. `local` means the main agent reviews locally with axis separation and must not dispatch child reviewers. `auto` lets the main agent judge whether independent child reviewers materially improve confidence. `prefer` asks the main agent to use them when a safe independent review split exists. If the policy is absent, follow the Goal Mode/non-Goal Mode resolution rules in Review Subagent Preference; never assume review subagents are enabled.
 - Consume git entry decisions, dirty-worktree baselines, implementation fixed points, commit hashes, and auto-commit decisions from workflow artifacts when present. Use them to define the review diff and to separate implementation changes from pre-existing user work.
 - Respect `Authority: external-tracker-only` markers in local artifacts. When present, read the named tracker item as the authoritative spec/review source and Goal Mode authorization source before relying on local `.spec-workflow` files.
 - If a business expectation, interaction rule, or acceptance criterion is genuinely missing after reading the authoritative decisions, use the built-in grilling gate. During Goal Mode, first record the new gap as a blocked workflow state, then ask one focused decision question and wait. Do not reopen settled expectations or reinterpret them silently.
@@ -106,6 +107,59 @@ Before starting final review tasks, confirm the implementation state is stable e
 - If reviewing a committed implementation, resolve the fixed point and review target commit before starting review. If reviewing uncommitted implementation, compare against the recorded dirty-worktree baseline and identify which dirty files belong to the implementation pass.
 - If the fixed point, target diff, or ownership state cannot be established, ask one focused clarification question before dispatching review child agents or writing review artifacts.
 
+## Review Subagent Preference
+
+Read `references/subagent-adapters.md` when the selected policy is `auto` or
+`prefer`, or when a missing policy must be resolved and host capability must be
+checked before deciding whether to ask.
+
+Resolve the policy using the branch that matches the current execution state:
+
+In Goal Mode:
+
+1. Current authoritative spec or latest applicable amendment.
+2. Authoritative tracker metadata when `Authority: external-tracker-only` applies.
+3. A current-conversation policy change is honored only after it is recorded in
+   the authoritative spec/amendment or tracker record for this spec version.
+
+Outside Goal Mode:
+
+1. An explicit review-specific choice in the current conversation.
+2. A user-selected review policy already recorded in the current authoritative
+   spec/amendment for the same stage.
+3. The latest review policy recorded for the same spec in
+   `implementation-report.md`, `review-report.md`, or prior review artifacts.
+4. If none exists, perform the conditional missing-policy flow below.
+
+Policy meanings:
+
+- `local`: main agent performs local axis-separated review. Do not start review
+  child agents even if the host supports them.
+- `auto`: main agent uses independent read-only review children only when they
+  materially improve confidence, especially for broad or high-risk reviews.
+- `prefer`: main agent actively looks for independent read-only review axes and
+  uses child reviewers when a safe split exists. If the review is too small or
+  tightly coupled, continue locally and explain why.
+
+In Goal Mode, the review policy must already have been selected during the final
+`to-spec` execution choices. If it is missing, pause and ask one decision
+question before starting review.
+
+Outside Goal Mode, resolve policy after the review DAG and diff scope are known:
+
+- If no recorded policy exists, first check whether the host supports child
+  reviewers and whether the review has at least two independent, read-only
+  review axes worth isolating.
+- Ask one review-subagent question only when child reviewers could materially
+  improve confidence. Persist the answer in the review report for the same
+  spec/stage.
+- If the review is small, single-module, low-risk, tightly coupled, or the host
+  cannot provide child agents, do not ask a ceremonial question; perform local
+  axis-separated review and record the fallback reason.
+
+The policy never overrides review safety. A user-selected `prefer` still cannot
+split an inseparable diff or give child reviewers write access.
+
 ## Review Coordination
 
 Choose the narrowest coordination structure that can review the delivery accurately:
@@ -113,7 +167,11 @@ Choose the narrowest coordination structure that can review the delivery accurat
 - Local axis-separated review: the main agent performs the review locally, keeping Standards, Spec, acceptance, frontend/backend, and risk axes separate in the report.
 - Internal review child agents: the main agent starts one or more child agents for independent read-only review axes, then aggregates findings and owns the final ship decision.
 
-Use internal review child agents when the review is broad, cross-module, high-risk, or benefits from independent Standards and Spec passes. Use local axis-separated review when the change is small, child-agent tooling is unavailable, or the review requires tightly coupled context that would be risky to split.
+Apply the user policy before choosing between these structures. `local` always
+uses local axis-separated review. `auto` chooses based on review breadth and
+risk. `prefer` uses internal read-only reviewers whenever at least two safe
+review axes exist. In every policy, tightly coupled context may remain local
+when splitting would weaken evidence or safety.
 
 The main agent must remain the reviewer of record:
 
@@ -123,6 +181,7 @@ The main agent must remain the reviewer of record:
 - Track every child-agent ID, status, output, evidence, blocker, and recovery attempt in the review report when artifacts are written.
 - Aggregate results after every review task completes. Do not only forward child-agent findings.
 - If no child agents are started, report that local axis separation was used.
+- Record the user-selected review policy and why child review was or was not used.
 
 ## Child Agent Recovery Policy
 
@@ -358,6 +417,7 @@ Ship decision (render the label and values with `references/bilingual-output.md`
 End with a final review report in the user's language:
 
 - Coordination structure used.
+- Recorded review subagent policy (`local`, `auto`, or `prefer`) and the coordination decision.
 - Goal Mode status for this spec, whether the goal is satisfied, and the next automatic stage or pause reason when enabled.
 - Actual review tasks executed.
 - Whether built-in code review was used.

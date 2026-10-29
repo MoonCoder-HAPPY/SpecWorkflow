@@ -227,7 +227,7 @@ Continue until each essential decision is closed, deferred, out of scope, or acc
 
 Write the spec so a later `spec-do` stage can implement it without guessing. Include every section below, using the user's language for section titles and content:
 
-- Goal Mode authorization metadata: pending selection until execution readiness, then enabled or disabled for this spec version only; spec ID; amendment ID when applicable; artifact root; authority marker; decision source and date; supersedes or superseded-by markers; agreed target, repair limit, backend, commit policy, and pause conditions. Record activation evidence and cycle counts in `implementation-report.md`, never infer running status from authorization alone. Use the contract in `references/goal-mode.md` when preparing this section.
+- Goal Mode authorization metadata: pending selection until execution readiness, then enabled or disabled for this spec version only; spec ID; amendment ID when applicable; artifact root; authority marker; decision source and date; supersedes or superseded-by markers; agreed target, repair limit, backend, commit policy, implementation subagent policy, review subagent policy, and pause conditions. Record activation evidence and cycle counts in `implementation-report.md`, never infer running status from authorization alone. Use the contract in `references/goal-mode.md` when preparing this section.
 - Problem statement from the user's perspective.
 - Solution from the user's perspective.
 - Background and goal.
@@ -361,6 +361,16 @@ Verify all of these before the final choice:
 - The selected runtime's prerequisite permissions, native setup/plan forms, execution location, and automatic commit behavior are understood. Do not offer a mode/commit policy the host cannot honor. A required setting change, new task/location, or increased access is a separate disclosed decision; Goal selection alone does not authorize it.
 - The branch and dirty baseline are settled. Classify workflow artifacts created during planning as owned workflow changes, not unknown dirty files.
 - Read `references/goal-mode.md` and the relevant host guidance in `references/agent-runtime-adapters.md`. Discover actual host capabilities without starting a goal. For an unknown host, unverified capability, version/surface mismatch, missing entry, conflicting evidence, or rejected activation contract, run the built-in current-host research procedure in `references/runtime-discovery.md` before choosing a fallback. Identify the usable backend, activation evidence, and any required user host action.
+- Before the final Goal Mode choice, ask the user to select an implementation subagent policy and a review subagent policy. These are two separate user decisions made one at a time through the Decision Question Format, not model defaults.
+- Implementation-stage question: “实施阶段如何使用子代理？”
+  - `auto` (recommended): independent slices may run in child agents when that materially improves execution; otherwise use local serial work.
+  - `prefer`: actively prefer child agents when a safe independent split exists; fall back locally and explain when it does not.
+  - `local`: main-agent-only implementation; do not start child agents.
+- Review-stage question: “最终审查阶段如何使用子代理？”
+  - `auto` (recommended): use independent read-only review agents when they materially improve confidence; otherwise use local axis-separated review.
+  - `prefer`: actively prefer independent read-only review agents when safe axes exist; fall back locally and explain when they do not.
+  - `local`: main-agent-only axis-separated review; do not start child reviewers.
+- Persist both policy values in the Goal Mode authorization metadata. A host that cannot provide child agents must be disclosed before the choice; `auto` may degrade to local, while `prefer` must report the unavailable capability rather than silently substitute.
 - Present the exact spec/version and artifact paths, completion target, Goal round limit (default recommendation: `3` automatic repair cycles), commit policy, and backend limits. Before the final execution choice, present the round-limit options from `references/goal-mode.md`: `3 rounds` (default, recommended), `5 rounds`, `10 rounds`, and `Custom`. Reuse an explicit limit already supplied for this version; do not ask again. Resolve custom values before the final choice, one decision at a time. Do not invent time/token budgets.
 
 If readiness fails, remain in planning and resolve the actual gap. Do not offer Goal Mode as a way to finish requirement gathering. An early request such as "run this autonomously" is a pending preference, not the final authorization.
@@ -378,7 +388,13 @@ After readiness passes, use the Decision Question Format to offer:
 
 Use an accurate backend label. When no persistent goal/loop is available, label the continuous options `session-only execution` and disclose that the host may end the turn and require a user continuation. Do not sell that as native Goal Mode. A backend that needs a user command remains `awaiting-host-activation` until verified.
 
-The user's continuous option approves the presented ready spec and its stated execution parameters together. Do not ask target, repair-limit, commit-policy, ticket, or testing questions after that choice unless the user introduces a change or a new blocker is discovered. If the user selects a custom alternative or changes scope, return to readiness and present a fresh final choice.
+The user's continuous option approves the presented ready spec and its stated
+execution parameters together, including the separately selected implementation
+and review subagent policies. Do not ask target, repair-limit, commit-policy,
+subagent-policy, ticket, or testing questions after that choice unless the user
+introduces a change or a new blocker is discovered. If the user selects a custom
+alternative or changes scope, return to readiness and present a fresh final
+choice.
 
 Persist the choice and authorization anchor in `spec.md` and the current amendment when applicable, following `references/goal-mode.md`. Mirror it to the tracker when the tracker is authoritative and the write is authorized. Then perform the real activation procedure from that reference, record the result in `implementation-report.md`, and enter `spec-do` only after the selected backend is verified (or session-only execution was explicitly selected). A sentence announcing Goal Mode and a Markdown flag are not activation.
 
@@ -389,7 +405,7 @@ When the user selects staged execution or pause, do not start any goal or implem
 End with:
 
 - The complete implementation-ready spec.
-- Goal Mode decision for this spec only, including goal target, maximum repair cycles, auto-commit authorization, and pause conditions when enabled.
+- Goal Mode decision for this spec only, including goal target, maximum repair cycles, auto-commit authorization, implementation subagent policy, review subagent policy, and pause conditions when enabled.
 - Whether ticket guidance was generated.
 - The spec path written.
 - The ticket paths written, if any.

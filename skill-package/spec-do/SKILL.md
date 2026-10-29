@@ -14,7 +14,7 @@ description: >-
 
 Use this skill as stage 3 of the spec-driven delivery workflow, and also as the repair implementation pass after `fix-review`. Turn persisted `to-spec` spec/ticket artifacts, amended spec artifacts, or `fix-review` repair-spec/repair-ticket artifacts into working code through a controlled implementation process.
 
-This skill uses built-in implementation behavior plus internal subagent coordination when parallel work is useful and safe. A small local serial implementation is the expected fast path when child agents would add ceremony or risk. All behavior needed for implementation, clarification gates, test-first validation, integration checking, child-agent coordination, and implementation self-review is internalized here. Do not invoke separate implementation, clarification, testing, review, setup, or orchestration skills for this stage, even if the user casually names them; their semantics must be handled by this skill. This does not override platform-required skills, tool-control skills, or non-duplicative user-requested skills.
+This skill uses built-in implementation behavior plus user-selected internal subagent coordination. Before implementation, resolve the user's policy (`local`, `auto`, or `prefer`) from the authoritative spec/amendment, tracker, implementation report, or current conversation using Subagent Coordination Preference. Do not assume a subagent default; in Goal Mode a missing policy pauses for the required choice, while outside Goal Mode ask only when the conditional policy-resolution rules establish that child agents could materially help. All behavior needed for implementation, clarification gates, test-first validation, integration checking, child-agent coordination, and implementation self-review is internalized here. Do not invoke separate implementation, clarification, testing, review, setup, or orchestration skills for this stage, even if the user casually names them; their semantics must be handled by this skill. This does not override platform-required skills, tool-control skills, or non-duplicative user-requested skills.
 
 ## Language And Bilingual Handoffs
 
@@ -29,9 +29,10 @@ Read `references/bilingual-output.md` before user text or artifact consumption. 
 - Do not expand scope beyond the approved spec or ticket. Record out-of-scope discoveries as follow-up work.
 - Do not invent missing business rules, data semantics, permission behavior, acceptance criteria, migration strategy, rollback behavior, or external service contracts.
 - If a required product or business decision is genuinely missing after checking the authoritative inputs, use the built-in grilling gate. During Goal Mode, first record a blocked workflow state and the exact newly discovered gap; then ask one focused decision question and wait. Do not reopen settled requirements or treat Goal Mode as a requirement-gathering stage.
+- Resolve the implementation subagent policy before changing files. `local` means the main agent must not dispatch child agents. `auto` lets the main agent judge whether child agents materially help. `prefer` asks the main agent to use them when a safe independent split exists. If the policy is absent, follow the Goal Mode/non-Goal Mode resolution rules in Subagent Coordination Preference; never assume subagents are enabled.
 - If the spec conflicts with current code, pause the affected branch, name the conflict, and decide whether the spec needs adjustment or the code needs repair. Ask the user only when the decision is product/business-facing.
 - Do not fake implementation, mock a success path as the real path, hard-code business results, create UI-only closure for backend behavior, leave TODO pseudo-completion, silently swallow errors, or bypass real logic only to satisfy tests.
-- Before implementation, decide whether the approved work should run as local serial implementation or use internal subagents. Do not ask the user to choose an execution mode merely for process.
+- Before implementation, apply the recorded or newly selected implementation subagent policy. Do not ask again when the policy is already settled, and do not ask when there is no meaningful parallel split or no usable child-agent capability.
 - Use local serial implementation for simple, concrete, low-risk changes, tightly coupled edits, same-file changes, unstable contracts, product decisions, or any task where child agents would add coordination overhead without reducing risk.
 - Use internal subagents only when the task can be split into meaningful independent slices with non-overlapping write scopes, stable contracts, clear dependencies, and independently verifiable outputs.
 - If internal subagent tooling is unavailable, continue with local serial implementation when the task is small enough or can be safely serialized. If the task truly requires parallel child work, pause and report the blocker.
@@ -108,16 +109,77 @@ During Goal Mode, apply the blocker and question rules in `references/goal-mode.
 
 When Goal Mode is disabled or absent, finish with the normal final implementation report and recommend the next stage instead of entering it automatically.
 
-## Coordination Choice
+## Subagent Coordination Preference
+
+Read `references/subagent-adapters.md` when the selected policy is `auto` or
+`prefer`, or when a missing policy must be resolved and host capability must be
+checked before deciding whether to ask.
+
+Resolve the policy using the branch that matches the current execution state:
+
+In Goal Mode:
+
+1. Current authoritative spec or latest applicable amendment.
+2. Authoritative tracker metadata when `Authority: external-tracker-only` applies.
+3. A current-conversation policy change is honored only after it is recorded in
+   the authoritative spec/amendment or tracker record for this spec version.
+
+Outside Goal Mode:
+
+1. An explicit stage-specific choice in the current conversation.
+2. A user-selected implementation policy already recorded in the current
+   authoritative spec/amendment for the same stage.
+3. The latest policy recorded for the same spec/stage in
+   `implementation-report.md`.
+4. If none exists, perform the conditional missing-policy flow below.
+
+Policy meanings:
+
+- `local`: main agent implements serially. Do not start child agents even if the
+  host supports them.
+- `auto`: main agent evaluates the DAG and host capability, then uses child
+  agents only when they materially reduce risk or time without creating unsafe
+  overlap.
+- `prefer`: main agent actively looks for safe independent slices and uses child
+  agents when they exist. If no safe split exists, continue serially and explain
+  why.
+
+In Goal Mode, the implementation policy must already have been selected during
+the final `to-spec` execution choices. If it is missing, pause and ask one
+decision question before implementation.
+
+Outside Goal Mode, resolve policy after the implementation DAG is known:
+
+- If no recorded policy exists, first check whether the host supports child
+  agents and whether at least two independent, non-overlapping, verifiable
+  write slices exist.
+- Ask one implementation-subagent question only when child agents could
+  materially help. Persist the answer for the same spec/stage in
+  `implementation-report.md`.
+- If the task is small, one-file, tightly coupled, has no safe parallel split,
+  or the host cannot provide child agents, do not ask a ceremonial question;
+  use local serial implementation and record the fallback reason.
+
+The policy never overrides file-ownership, contract, permission, or validation
+safety. A user-selected `prefer` still cannot make overlapping writes or
+unresolved shared contracts parallel.
+
+## Coordination Choice After Preference
 
 After reading the spec inputs and before producing the executable DAG, choose the narrowest coordination structure that can complete the work safely:
 
 1. Local serial implementation: the main agent implements the work directly with no child agents.
 2. Internal subagents: the main agent coordinates parallel or semi-parallel child work and remains responsible for integration, conflict control, validation, and final reporting.
 
-Prefer local serial implementation when the task is simple, one-file, tightly coupled, uncertain, or likely to involve product decisions. Prefer internal subagents only when parallelism materially reduces risk or time and the work can be split without overlapping writes or unstable contracts.
+Apply the user policy before choosing between these structures. `local` always
+selects main-agent serial work. `auto` chooses based on task independence and
+risk. `prefer` selects internal subagents whenever at least two tasks are safe
+to split. In every policy, simple/tightly coupled tasks may remain serial when
+parallelism would add risk rather than value.
 
-State the chosen coordination structure, the reason, and whether any child agents will be started. Ask the user only when the choice changes product/business behavior, creates safety risk, or cannot be made from the available context.
+State the recorded policy, chosen coordination structure, reason, and whether
+any child agents will be started. Do not reinterpret `local` as `auto`, or
+silently replace a missing preference with the model's preferred mode.
 
 ## Workflow Git Baseline Check
 
@@ -159,7 +221,8 @@ Gate rules:
 
 ## Internal Subagent Coordination
 
-Use this section only when the chosen coordination structure includes internal subagents.
+Use this section only when the chosen policy/coordination structure includes
+internal subagents.
 
 Use the current environment's subagent tools directly. The main agent remains the coordinator and must:
 
@@ -417,7 +480,7 @@ Run an implementation self-check before final reporting:
 - Standards axis: check the diff against documented repo standards and the smell baseline below. Repo standards override the smell baseline. Treat baseline smells as judgement calls, not hard violations. Skip anything already enforced by tooling.
 - Spec axis: check whether the diff faithfully implements the originating spec or ticket, whether any requirement is missing or partial, whether behavior was added beyond scope, and whether any implemented requirement looks wrong.
 - Scope axis: confirm no unapproved behavior was added.
-- Keep Standards and Spec axes isolated. Use separate internal review child agents for the two axes when child-agent review is safe and available. If local review is the only safe option, perform the axes separately in sequence and report that isolation was local rather than child-agent-based.
+- Keep Standards and Spec axes isolated. During this implementation-stage self-check, use separate internal review child agents for the two axes only when the resolved implementation subagent policy permits child use and that use is safe and materially helpful. For `local`, or when child use is unsafe or unavailable, perform the axes separately in sequence and report that isolation was local rather than child-agent-based.
 - Aggregate Standards and Spec findings side by side. Do not merge, rerank, or pick a single overall winner across the axes.
 - Fix clear implementation misses before final reporting when the fix is in scope and safe. If the finding requires new product scope or a changed requirement, record it as blocked or follow-up instead of expanding scope.
 
@@ -445,6 +508,7 @@ End with a final implementation report in the user's language:
 - Coordination structure used.
 - Parallel and serial task split.
 - Actual child agents started.
+- Recorded implementation subagent policy (`local`, `auto`, or `prefer`) and the coordination decision.
 - Which tasks required built-in implementation behavior, and whether they were completed locally or by child agents.
 - Completion status for each task.
 - Files or modules changed.
